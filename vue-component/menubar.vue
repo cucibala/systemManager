@@ -10,6 +10,9 @@
 						<router-link  to="/search" >搜索</router-link>
 					</li>
 					<li @click="menuClick">
+						<router-link  to="/user" >用户</router-link>
+					</li>
+					<li @click="menuClick">
 						<router-link  to="/error" >留言</router-link>
 					</li>
 				</ul>

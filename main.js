@@ -12,6 +12,7 @@ axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
+var test=true;
 function baseDull(array){
 	array.forEach(item=>{
 		try{
@@ -44,7 +45,7 @@ function baseDull(array){
 const store=new Vuex.Store({
 	state:{
 		Temp:"Hello wrold",
-		showMenuBar:"true",
+		showMenuBar:true,
 		indexImages:"",
 		user:"",
 		refreshPage:false,
@@ -170,7 +171,6 @@ const store=new Vuex.Store({
 			//每一页最多包含的页数
 			state.searchPageDatas.pageSize=col*row;
 			state.searchPageDatas.col=col;
-			console.log(value.width,col,"   ",value.height,row,"包含页数",col*row);
 		},
 		//初始化房间信息
 		initRoomData(state,value){
@@ -353,7 +353,7 @@ const store=new Vuex.Store({
 				setTimeout(()=>{
 					state.isGettingData=false;
 				},500);
-				_this.commit("addPromtMessage","获取信息发生异常");
+				_this.commit("addPromtMessage","获取信息发生异常"+x.message);
 			});
 		}
 	},
@@ -382,6 +382,13 @@ const Routers=[
 	component:(resolve)=>require(['./views/search.vue'],resolve)
 },
 {
+	path:'/user',
+	meta:{
+		title:'用户'
+	},
+	component:(resolve)=>require(['./views/user.vue'],resolve)
+},
+{
 	path:'/error',
 	meta:{
 		title:'错误'
@@ -404,21 +411,26 @@ const RouterConfig={
 };
 const router=new VueRouter(RouterConfig);
 router.beforeEach((to,from,next)=>{
-	window.document.title=to.meta.title;
-	if(to.path!="/login"){
-		let token=$.cookie("isLogin");
-		//首先判断是否登陆
-		if(!token||token!="true"){
-			next('/login');
+	if(!test){
+		window.document.title=to.meta.title;
+		if(to.path!="/login"){
+			let token=$.cookie("isLogin");
+			//首先判断是否登陆
+			if(!token||token!="true"){
+				next('/login');
+			}else{
+				store.state.showMenuBar=true;
+				next();
+			}
 		}else{
-			store.state.showMenuBar=true;
+			store.state.showMenuBar=false;
+			$.cookie('isLogin', false);
 			next();
 		}
 	}else{
-		store.state.showMenuBar=false;
-		$.cookie('isLogin', false);
 		next();
 	}
+	
 });
 router.afterEach((to,from,next)=>{
 	//window.scrollTo(0,0);

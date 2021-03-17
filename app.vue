@@ -108,6 +108,8 @@
 							_this.$store.commit('addPromtMessage',"登陆过期");
 							_this.$router.push('/login');
 						}
+					}).catch(e=>{
+						console.log("error");
 					});
 				}else{
 					_this.$store.commit('addPromtMessage',"登陆过期");
@@ -135,8 +137,7 @@
 				height=$(window).height()-20;
 				$("#mainContainer").height(height);
 				_this.$store.commit('updateBrowerPortype',{width,height});
-			} 
-			console.log(window);
+			}
 		}
 	}
 </script>

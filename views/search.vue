@@ -744,7 +744,7 @@
 			}
 		},
 		beforeRouteLeave(to, from, next){
-			resultContainer.unbind();
+			resultContainer.onscroll=null;
 			next();
 		}
 	}
