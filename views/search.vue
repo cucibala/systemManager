@@ -749,7 +749,7 @@
 		}
 	}
 </script>
-<style type="text/css" lang="less">
+<style type="text/css" lang="less" scoped>
 @min624:~"(min-width: 624px)";
 @pcSize:~"(min-width: 1024px)";
 @middleSize:~"(min-width: 624px) and (max-width: 1024px)";
