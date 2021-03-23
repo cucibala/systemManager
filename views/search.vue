@@ -2,6 +2,13 @@
 	<div class="pageContainer">
 		<div class="headerContainer">
 			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(1)" :style="computedSwicth(1)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(2)" :style="computedSwicth(2)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(3)" :style="computedSwicth(3)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
 			<template v-for="targetData in targetSearchDatas">
 				<div class="switchbox" @click="switchToTarget(targetData.bindID)" :style="computedSwicth(targetData.bindID)"><span>搜索{{targetData.bindID}}</span></div>
 			</template>
@@ -355,7 +362,7 @@
 		methods:{
 			computedSwicth(index){
 				if(index==this.target){
-					return "background-color:#ffc800;color:white;";
+					return "background-color:#008D57;color:white;";
 				}else{
 					return "";
 				}
@@ -724,6 +731,7 @@
 			_this.searchData.reverse();
 			resultContainer=$(".resultContainer")[0];
 			resultContainer.onscroll=()=>{
+				console.log("123");
 				//隐藏搜索框
 				if(_this.searchBoxState=="show"&&!_this.isFocusOnBoX&&_this.openScrollWatch){
 					_this.searchBoxState="hide";
@@ -763,7 +771,7 @@
 }
 .pageContainer{
 	height: calc(100% - 90px);
-	margin-top: 90px;
+	margin-top: 70px;
 }
 .headSearchBox{
 	position: fixed;
@@ -1092,6 +1100,7 @@
 	white-space:nowrap;
 	overflow: auto;
 	position: fixed;
+	
 	@media @min624{
 		width: 70%;
 		padding-left:30%; 
@@ -1106,5 +1115,5 @@
 		vertical-align: top;
 		border: 1px solid #123456;
 	}
-}
+	}
 </style>

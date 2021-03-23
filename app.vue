@@ -128,20 +128,28 @@
 			this.$store.commit('refreshPage');
 			/*http://pv.sohu.com/cityjson?ie=utf-8查询ip地址接口*/
 
-			let width=$(window).width();
+			let width=$(window).width()-20;
 			let height=$(window).height()-20;
 			$("#mainContainer").height(height);
+			$("#mainContainer").width(width);
 			_this.$store.commit('updateBrowerPortype',{width,height});
 			window.onresize=()=>{
-				width=$(window).width();
-				height=$(window).height()-20;
+				width=$(window).width()-20;
+				height=$(window).height()-40;
 				$("#mainContainer").height(height);
+				$("#mainContainer").width(width);
 				_this.$store.commit('updateBrowerPortype',{width,height});
 			}
 		}
 	}
 </script>
 <style lang="less">
+body{
+	background: #e8e9ec;
+}
+.inline-block{
+	display: inline-block;
+}
 .bottom-box{
 	position: absolute;
 	bottom: 0px;
@@ -163,7 +171,10 @@ ul,dl,ol, li{
 #mainContainer{
 	text-align: center;
 	font-size: 1.7rem;
-	overflow: hidden;
+	overflow: hide;
+	position: absolute;
+	left: 10px;
+	top: 10px;
 }
 //---每一个页面都是一个pageContainer
 .pageContainer{

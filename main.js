@@ -389,6 +389,13 @@ const Routers=[
 	component:(resolve)=>require(['./views/user.vue'],resolve)
 },
 {
+	path:'/contact',
+	meta:{
+		title:'留言'
+	},
+	component:(resolve)=>require(['./views/contact.vue'],resolve)
+},
+{
 	path:'/error',
 	meta:{
 		title:'错误'

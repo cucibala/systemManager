@@ -31,8 +31,18 @@
 		<!-- 选择第二个的时候显示的东西 -->
 		<div class="mainContainer" v-if="activeSwitch==2">
 			<div class="leftWindow absoluteBox">
-				<span @click="progresSwitchClick(1)" :state="activeProgresSwitch==1">506教室 11.2-11.6</span>
-				<span @click="progresSwitchClick(2)" :state="activeProgresSwitch==2">506教室 11.2-11.6</span>
+				<div class="innerItem">
+					<span @click="progresSwitchClick(1)" :state="activeProgresSwitch==1">506教室 11.2-11.6</span>
+				</div>
+				<div class="innerItem">
+					<span @click="progresSwitchClick(2)" :state="activeProgresSwitch==2">506教室 11.2-11.6</span>
+				</div>
+				<div class="innerItem">
+					<span @click="progresSwitchClick(3)" :state="activeProgresSwitch==3">506教室 11.2-11.6</span>
+				</div>
+				<div class="innerItem">
+					<span @click="progresSwitchClick(4)" :state="activeProgresSwitch==4">506教室 11.2-11.6</span>
+				</div>
 			</div>
 			<div class="rightWindow absoluteBox">
 				
@@ -107,7 +117,7 @@
 	font-size: 1rem;
 	position:relative;
 	text-align:left;
-	>.innerItem{
+	.innerItem{
 		width: 100%;
 		height: 24px;
 		margin-top: 5px;
@@ -118,23 +128,28 @@
 			margin-right: 10px;
 		}
 	}
-	>.leftWindow{
+	.leftWindow{
 		width:calc(@leftWindowSize - @containerPadding);
 		height: 100%;
 		left: @containerPadding;
-		span{
-			display: inline-block;
-			width: 100%;
-			height: 24px;
-			margin-bottom: 10px;
-			cursor: pointer;
-			background-color: #e0e0e0;
-		}
-		span[state="true"]{
-			background-color:#c8ffa6;
+		.innerItem{
+			span{
+				display: inline-block;
+				cursor: pointer;
+				background-color: #e0e0e0;
+				white-space: nowrap;
+				text-align:left;
+			}
+			span:not(:hover){
+				overflow:hidden;
+				text-overflow:ellipsis;
+			}
+			span[state="true"]{
+				background-color:#008d57;
+			}
 		}
 	}
-	>.rightWindow{
+	.rightWindow{
 		right: @containerPadding;
 		width:calc((100% - @leftWindowSize) - @containerPadding);
 		height: 100%;

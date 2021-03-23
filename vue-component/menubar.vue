@@ -13,8 +13,11 @@
 						<router-link  to="/user" >用户</router-link>
 					</li>
 					<li @click="menuClick">
-						<router-link  to="/error" >留言</router-link>
+						<router-link  to="/contact" >留言</router-link>
 					</li>
+					<!-- <li @click="menuClick">
+						<router-link  to="/error" >留言</router-link>
+					</li> -->
 				</ul>
 				<div class="bottom-box">
 					<span @click="exitLogin">退出登陆</span>
