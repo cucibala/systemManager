@@ -2,116 +2,64 @@
 	<div class="pageContainer">
 		<div class="headerContainer">
 			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(1)" :style="computedSwicth(1)"><span>默认</span></div>
+			<!-- <div class="switchbox" @click="switchToTarget(1)" :style="computedSwicth(1)"><span>默认</span></div>
 			<div class="switchbox" @click="switchToTarget(2)" :style="computedSwicth(2)"><span>默认</span></div>
 			<div class="switchbox" @click="switchToTarget(3)" :style="computedSwicth(3)"><span>默认</span></div>
 			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
 			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
 			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
+			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div> -->
 			<template v-for="targetData in targetSearchDatas">
 				<div class="switchbox" @click="switchToTarget(targetData.bindID)" :style="computedSwicth(targetData.bindID)"><span>搜索{{targetData.bindID}}</span></div>
 			</template>
 		</div>
-		<div class="headSearchBox" :state="searchBoxState" @click="headSearchBoxClick()">
-			<form method="post">
-				<div class="inputContainer">
-					<vmy-input ctitle="软件名" ctype="1" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'softwareName')" :clearSign="searchData.clearSign"></vmy-input>
-				</div>
-				<div class="inputContainer">
-					<vmy-input ctitle="教室" ctype="2" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'room')" :clearSign="searchData.clearSign"></vmy-input>
-					<vmy-input ctitle="教学楼" ctype="2" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'build')" :clearSign="searchData.clearSign"></vmy-input>
-				</div>
-				<div class="inputContainer">
-					<vmy-input ctitle="人数" ctype="3" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'peopleCpa')" :clearSign="searchData.clearSign"></vmy-input>
-				</div>
-				<div class="inputContainer1">
-					<label>开始日期:</label><input  type="date" v-model="searchData.startDate"/>
-				</div>
-				<div class="inputContainer1">
-					<label>结束日期:</label><input  type="date" v-model="searchData.endDate" :min="searchData.startDate"/>
-				</div>
-				<div class="inputContainer1" id="timeSpanInput">
-					<div class="margin-right">
-						<template v-for="(item,index) in searchData.timeSpan">
-							<label >时间段:
-								<input type="time" v-model="item.start" />
-								-
-								<input  type="time" v-model="item.end" :min="item.start"/>
-							</label>
-							<span v-if="index>=1" class="deleteButton" @click="sliceTimeSpan(index)">
-								X
-							</span>
-						</template>
-					</div>
-					<sbutton @mdEvent="searchData.addItem()">+</sbutton>
-				</div>
-				<div class="inputContainer1">
-					<label>周一<input name="week" type="checkbox" value="1" v-model="searchData.week.mon"/></label> 
-					<label>周二<input name="week" type="checkbox" value="2" v-model="searchData.week.tue"/></label> 
-					<label>周三<input name="week" type="checkbox" value="3" v-model="searchData.week.wed"/></label> 
-					<label>周四<input name="week" type="checkbox" value="4" v-model="searchData.week.thur"/></label>
-					<label>周五<input name="week" type="checkbox" value="5" v-model="searchData.week.fri"/></label> 
-					<label>周六<input name="week" type="checkbox" value="6" v-model="searchData.week.sat"/></label>
-					<label>周日<input name="week" type="checkbox" value="7" v-model="searchData.week.sun"/></label>
-				</div>
-				<!-- <button @click="reverseForm()">重置</button> -->
-				<sbutton @mdEvent="onSearchClick()">搜索</sbutton>
-				<template v-if="userLevel==2">
-					<sbutton @mdEvent="toggleAddSoftWareBox('show')" class="vertical-center">
-						添加
-					</sbutton>
-				</template>
-				<input type="reset" @click="searchData.reverse()">
-			</form>
-			<div class="bg">
-			</div>
-		</div>
 		<div class="resultContainer">
-			<template v-for="data in searchPageDatas.datas">
-				<div class="resultContainerShow" :state="data.state">
+			<div class="innerContainer">
+				<template v-for="data in searchPageDatas.datas">
+					<div class="resultContainerShow" :state="data.state">
 
-					<div>
-						<!-- 房间的标题 -->
-						<span class="title" @click="toggleRoomTitle(data)" v-if="data.title==data.room" active>
-							{{data.room}}
-						</span>
-						<span class="title" @click="toggleRoomTitle(data)" v-else disactive>
-							{{data.build}}
-						</span>
-						<!-- 小教室的标题 -->
-						<span class="smallTitle">教室软件:</span>
-						<!-- 包含所有软件的一个div -->
-						<div class="smallContainer">
-							<template v-for="software in data.softwares.datas">
-								<span class="ele" :type="software.type" v-if="software.page==data.softwares.currentPage">{{software.name}}->[{{software.system}}]</span>
-							</template>
-							<div class="bottomContainer">
-								<span @click="resultItemPagePrevious(data.softwares)"><</span>
-								<div>
-									<span>{{data.softwares.currentPage}}</span>
-									<span>/</span>
-									<span>{{data.softwares.maxPage}}</span>
+						<div>
+							<!-- 房间的标题 -->
+							<span class="title" @click="toggleRoomTitle(data)" v-if="data.title==data.room" active>
+								{{data.room}}
+							</span>
+							<span class="title" @click="toggleRoomTitle(data)" v-else disactive>
+								{{data.build}}
+							</span>
+							<!-- 小教室的标题 -->
+							<span class="smallTitle">教室软件:</span>
+							<!-- 包含所有软件的一个div -->
+							<div class="smallContainer">
+								<template v-for="software in data.softwares.datas">
+									<span class="ele" :type="software.type" v-if="software.page==data.softwares.currentPage">{{software.name}}->[{{software.system}}]</span>
+								</template>
+								<div class="bottomContainer">
+									<span @click="resultItemPagePrevious(data.softwares)"><</span>
+									<div>
+										<span>{{data.softwares.currentPage}}</span>
+										<span>/</span>
+										<span>{{data.softwares.maxPage}}</span>
+									</div>
+									<span @click="resultItemPageNext(data.softwares)">></span>
 								</div>
-								<span @click="resultItemPageNext(data.softwares)">></span>
 							</div>
 						</div>
+						<!-- 存在于房间信息底部的区域 -->
+						<div>
+							<sbutton>申请</sbutton>
+							<template v-if="userLevel==2">
+								<sbutton @mdEvent="modifyRoom(data)" class="vertical-center">
+									修改
+								</sbutton>
+								<sbutton @mdEvent="deleteRoom(data)" class="vertical-center">
+									删除
+								</sbutton>
+							</template>
+						</div>
 					</div>
-					<!-- 存在于房间信息底部的区域 -->
-					<div>
-						<sbutton>申请</sbutton>
-						<template v-if="userLevel==2">
-							<sbutton @mdEvent="modifyRoom(data)" class="vertical-center">
-								修改
-							</sbutton>
-							<sbutton @mdEvent="deleteRoom(data)" class="vertical-center">
-								删除
-							</sbutton>
-						</template>
-					</div>
-				</div>
-			</template>
-			<p v-if="searchPageDatas.maxTotal==searchPageDatas.currentTotal">已经到底了。。。</p>
+				</template>
+				<p v-if="searchPageDatas.maxTotal==searchPageDatas.currentTotal">已经到底了。。。</p>
+			</div>
 		</div>
 		<div class="operateBox" :state="modifyBoxState">
 			<div>
@@ -239,6 +187,60 @@
 			<div class="bgcolor" style="background-color:rgb(251 255 222);opacity: 0.95;"></div>
 			<div class="exit-button" @click="toggleAddSoftWareBox('hide')">X</div>
 		</div>
+		<div class="flowSearchBox" :state="searchBoxState" @click="flowSearchBoxClick()">
+			<form method="post">
+				<div class="inputContainer">
+					<vmy-input ctitle="软件名" ctype="1" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'softwareName')" :clearSign="searchData.clearSign"></vmy-input>
+				</div>
+				<div class="inputContainer">
+					<vmy-input ctitle="教室" ctype="2" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'room')" :clearSign="searchData.clearSign"></vmy-input>
+					<vmy-input ctitle="教学楼" ctype="2" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'build')" :clearSign="searchData.clearSign"></vmy-input>
+				</div>
+				<div class="inputContainer">
+					<vmy-input ctitle="人数" ctype="3" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'peopleCpa')" :clearSign="searchData.clearSign"></vmy-input>
+				</div>
+				<div class="inputContainer1">
+					<label>开始日期:</label><input  type="date" v-model="searchData.startDate"/>
+				</div>
+				<div class="inputContainer1">
+					<label>结束日期:</label><input  type="date" v-model="searchData.endDate" :min="searchData.startDate"/>
+				</div>
+				<div class="inputContainer1" id="timeSpanInput">
+					<div class="margin-right">
+						<template v-for="(item,index) in searchData.timeSpan">
+							<label >时间段:
+								<input type="time" v-model="item.start" />
+								-
+								<input  type="time" v-model="item.end" :min="item.start"/>
+							</label>
+							<span v-if="index>=1" class="deleteButton" @click="sliceTimeSpan(index)">
+								X
+							</span>
+						</template>
+					</div>
+					<sbutton @mdEvent="searchData.addItem()">+</sbutton>
+				</div>
+				<div class="inputContainer1">
+					<label>周一<input name="week" type="checkbox" value="1" v-model="searchData.week.mon"/></label> 
+					<label>周二<input name="week" type="checkbox" value="2" v-model="searchData.week.tue"/></label> 
+					<label>周三<input name="week" type="checkbox" value="3" v-model="searchData.week.wed"/></label> 
+					<label>周四<input name="week" type="checkbox" value="4" v-model="searchData.week.thur"/></label>
+					<label>周五<input name="week" type="checkbox" value="5" v-model="searchData.week.fri"/></label> 
+					<label>周六<input name="week" type="checkbox" value="6" v-model="searchData.week.sat"/></label>
+					<label>周日<input name="week" type="checkbox" value="7" v-model="searchData.week.sun"/></label>
+				</div>
+				<!-- <button @click="reverseForm()">重置</button> -->
+				<sbutton @mdEvent="onSearchClick()">搜索</sbutton>
+				<template v-if="userLevel==2">
+					<sbutton @mdEvent="toggleAddSoftWareBox('show')" class="vertical-center">
+						添加
+					</sbutton>
+				</template>
+				<input type="reset" @click="searchData.reverse()">
+			</form>
+			<div class="bg">
+			</div>
+		</div>
 	</div>
 </template>
 <script>
@@ -263,12 +265,6 @@
 				isFocusOnBoX:false,
 				//离开输入框一秒后开启滑动监听，用来关闭搜索框
 				openScrollWatch:true,
-				//--用来添加时间段的元素----------start---------------------
-				// timeSpanEle:null,
-				// timeSpanFather:null,
-				// timeSpanButton:null,
-				// newTimeSpanList:[],//当前添加的时间段
-				//--用来添加时间段的元素-----------end--------------------
 				softWareBoxState:"hide",//---是否显示添加软件的窗口"show" 或者 "hide"
 				modifyBoxState:"hide",
 				//----新增软件的数据绑定
@@ -394,7 +390,7 @@
 				this.$store.commit("getData",{opreate:"search",ts:JSON.stringify(this.searchData)});
 			},
 			//点击显示搜索盒子
-			headSearchBoxClick(){
+			flowSearchBoxClick(){
 				let _this = this
 				if(this.searchBoxState=="hide"){
 					this.searchBoxState="show";
@@ -731,7 +727,6 @@
 			_this.searchData.reverse();
 			resultContainer=$(".resultContainer")[0];
 			resultContainer.onscroll=()=>{
-				console.log("123");
 				//隐藏搜索框
 				if(_this.searchBoxState=="show"&&!_this.isFocusOnBoX&&_this.openScrollWatch){
 					_this.searchBoxState="hide";
@@ -758,22 +753,172 @@
 	}
 </script>
 <style type="text/css" lang="less" scoped>
+
 @min624:~"(min-width: 624px)";
 @pcSize:~"(min-width: 1024px)";
 @middleSize:~"(min-width: 624px) and (max-width: 1024px)";
 @phoneSize:~"(max-width: 624px)";
-@resultItemBoxWidthPhone:150px;
-@resultItemBoxWidthWindow:200px;
+
+@resultItemBoxPadding:2px;
+@resultItemBoxWidthPhone:150px - @resultItemBoxPadding*2;
+@resultItemBoxWidthWindow:200px - @resultItemBoxPadding*2;
+@headerContainerHeight:43px;
+@resultContainerPadding:5px;
+@resultContainerMarginTop:5px;
+@resultContainerHeight:100% - @resultContainerPadding*2 - @headerContainerHeight - @resultContainerMarginTop;
 @keyframes rotateSingleRound
 {
 	from {transform:rotateX(0deg)}
 	to {background:rotateX(360deg)}
 }
+
 .pageContainer{
 	height: calc(100% - 90px);
 	margin-top: 70px;
 }
-.headSearchBox{
+.headerContainer{
+	width: 90%;
+	height: @headerContainerHeight;
+	top: 60px;
+	background-color: #e3e3e36b;
+	text-align: left;
+	padding-left:10px; 
+	transition: all 1s;
+	white-space:nowrap;
+	overflow: auto;
+	@media @min624{
+		width: 70%;
+		padding-left:43px; 
+	}
+	.switchbox{
+		margin:0px	5px 0px 5px;
+		display: inline-block;
+		width: 43px;
+		height: calc(100% - 22px);
+		padding: 10px;
+		font-size: 1rem;
+		vertical-align: top;
+		border: 1px solid #123456;
+		cursor: pointer;
+	}
+}
+.resultContainer{
+	z-index: 1;
+	font-size: 1rem;
+	position: relative;
+	overflow: auto;
+	text-align: left;
+	height:calc(@resultContainerHeight);
+	padding: @resultContainerPadding;
+	margin-top: @resultContainerMarginTop;
+	.innerContainer{
+		width: 100%;
+		min-height: calc(100% + 10px);
+		.resultContainerShow{
+			display: inline-block;
+			vertical-align:top;
+			margin: 10px 2.5px 0px 2.5px;
+			height: 300px;
+			padding: @resultItemBoxPadding;
+			@media @phoneSize{
+				width: @resultItemBoxWidthPhone;
+			}
+			@media @min624{
+				width: @resultItemBoxWidthWindow;
+			}
+			div:nth-child(1){
+				width: 100%;
+				height: calc(100% - 30px);
+				.title{
+					width: 100%;
+					font-size: 25px;
+					display: inline-block;
+					font-weight: bold;
+					text-align: center;
+					background-color: #1aaaaf;
+					transition: all 0.5s;
+				}
+				.title[active]{
+					transform: rotateX(360deg);
+				}
+				.smallTitle{
+					width: 100%;
+					font-size: 15px;
+					display: inline-block;
+					text-align: left;
+					font-weight: bold;
+				}
+				.smallContainer{
+					width: 100%;
+					height: 120px;
+					position: relative;
+					.ele{
+						margin-top: 2px;
+						width:calc(100% - 24px);
+						font-size: 13px;
+						padding-left:20px;
+						display: inline-block;
+						text-align: left;
+						white-space:nowrap;
+						overflow-x: hidden;
+						border: solid 2px green;
+					}
+					.ele[type="target"]{
+						background-color: #4d9667;
+						color: white;
+					}
+					.ele[type="other"]{
+
+					}
+					.bottomContainer{
+						position: absolute;
+						width: 100%;
+						height: 20px;
+						bottom: -20px;
+						background-color: #aaaaaa;
+						>span{
+							cursor:pointer;
+							display: inline-block;
+							height: 100%;
+							width: 20%;
+							background-color: #aa4444;
+							text-align: center;
+						}
+						>span:nth-child(1){
+							position: absolute;
+							left: 0px;
+						}
+						>div:nth-child(2){
+							width: 60%;
+							height: 100%;
+							display: inline-block;
+							text-align: center;
+							position: absolute;
+							left: 20%;
+						}
+						>span:nth-child(3){
+							position: absolute;
+							right: 0px;
+						}
+
+					}
+				}
+			}
+			div:nth-child(2){
+				height: 30px;
+				width: 100%;
+				text-align: center;
+			}
+		}
+		.resultContainerShow[state="able"]{
+			border: solid 3px green;
+		}
+		.resultContainerShow[state="disable"]{
+			border: solid 3px red;
+		}
+	}
+}
+.flowSearchBox{
 	position: fixed;
 	z-index: 2;
 	min-width: 300px;
@@ -809,10 +954,6 @@
 		height: 60px;
 		margin: 10px 0px;
 		text-align: left;
-		// div:nth-child(2){
-		// 	top: 0px;
-		// 	right:calc(100% - calc(100% - 40px) - 11.5px);
-		// }
 	}
 	.inputContainer1{
 		position: relative;
@@ -834,7 +975,7 @@
 		}
 	}
 }
-.headSearchBox[state="hide"]{
+.flowSearchBox[state="hide"]{
 	@media @phoneSize{
 		opacity: 0.2;
 		transform: translateX(-95%);
@@ -848,136 +989,13 @@
 		transform: translateY(-130%);
 	}
 }
-.headSearchBox[state="show"]{
+.flowSearchBox[state="show"]{
 	transform: translateX(0);
 	@media @middleSize{
 		left: calc(50% - 220px);
 	}
 }
-.resultContainer{
-	z-index: 1;
-	font-size: 1rem;
-	position: relative;
-	height: 100%;
-	overflow: auto;
-	padding: 10px;
-	text-align: left;
-	// @media @phoneSize{
-	// 	top: 52px;
-	// 	left: 5%;
-	// 	width: 90%;
-	// 	padding: 5px;
-	// 	text-align: left;
-	// }
-	// @media @min624{
-	// 	top: 52px;
-	// 	left: 5%;
-	// 	width: 90%;
-	// 	padding: 5px;
-	// 	text-align: left;
-	// }
-	.resultContainerShow{
-		display: inline-block;
-		vertical-align:top;
-		margin: 10px 2.5px 0px 2.5px;
-		height: 300px;
-		@media @phoneSize{
-			width: @resultItemBoxWidthPhone;
-		}
-		@media @min624{
-			width: @resultItemBoxWidthWindow;
-		}
-		div:nth-child(1){
-			width: 100%;
-			height: calc(100% - 30px);
-			.title{
-				width: 100%;
-				font-size: 25px;
-				display: inline-block;
-				font-weight: bold;
-				text-align: center;
-				background-color: #1aaaaf;
-				transition: all 0.5s;
-			}
-			.title[active]{
-				transform: rotateX(360deg);
-			}
-			.smallTitle{
-				width: 100%;
-				font-size: 15px;
-				display: inline-block;
-				text-align: left;
-				font-weight: bold;
-			}
-			.smallContainer{
-				width: 100%;
-				height: 120px;
-				position: relative;
-				.ele{
-					margin-top: 2px;
-					width:calc(100% - 24px);
-					font-size: 13px;
-					padding-left:20px;
-					display: inline-block;
-					text-align: left;
-					white-space:nowrap;
-					overflow-x: hidden;
-					border: solid 2px green;
-				}
-				.ele[type="target"]{
-					background-color: #4d9667;
-					color: white;
-				}
-				.ele[type="other"]{
 
-				}
-				.bottomContainer{
-					position: absolute;
-					width: 100%;
-					height: 20px;
-					bottom: 0px;
-					background-color: #aaaaaa;
-					>span{
-						cursor:pointer;
-						display: inline-block;
-						height: 100%;
-						width: 20%;
-						background-color: #aa4444;
-						text-align: center;
-					}
-					>span:nth-child(1){
-						position: absolute;
-						left: 0px;
-					}
-					>div:nth-child(2){
-						width: 60%;
-						height: 100%;
-						display: inline-block;
-						text-align: center;
-						position: absolute;
-						left: 20%;
-					}
-					>span:nth-child(3){
-						position: absolute;
-						right: 0px;
-					}
-
-				}
-			}
-		}
-		div:nth-child(2){
-			height: 30px;
-			width: 100%;
-			text-align: center;
-		}
-	}
-	.resultContainerShow[state="able"]{
-		border: solid 3px green;
-	}
-	.resultContainerShow[state="disable"]{
-		border: solid 3px red;
-	}
-}
 .deleteButton{
 	content: "X";
 	display: inline-block;
@@ -1089,31 +1107,5 @@
 .operateBox[state="show"]{
 	transform: translateX(0);
 }
-.headerContainer{
-	width: 98%;
-	height: 26px;
-	top: 60px;
-	background-color: #e3e3e36b;
-	text-align: left;
-	padding-left:10px; 
-	transition: all 1s;
-	white-space:nowrap;
-	overflow: auto;
-	position: fixed;
-	
-	@media @min624{
-		width: 70%;
-		padding-left:30%; 
-	}
-	.switchbox{
-		margin:0px	10px 0px 10px;
-		display: inline-block;
-		width: 60px;
-		height: calc(100% - 6px);
-		padding: 2px;
-		font-size: 1rem;
-		vertical-align: top;
-		border: 1px solid #123456;
-	}
-	}
+
 </style>

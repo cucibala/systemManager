@@ -104,7 +104,7 @@
 }
 .aniHr{
 	width: @hrWidth;
-	height: 8px;
+	height: 1px;
 	background-color: #ff7600;
 	animation: myfirst 1s;
 	-webkit-animation: myfirst 1s; /* Safari 与 Chrome */
@@ -129,31 +129,40 @@
 		}
 	}
 	.leftWindow{
-		width:calc(@leftWindowSize - @containerPadding);
-		height: 100%;
+		width:calc(@leftWindowSize - @containerPadding  - 8px);
+		height: calc(100% - (@containerPadding*2));
 		left: @containerPadding;
+		background-color:#008d57;
+		padding: 4px;
+		z-index: 2;
 		.innerItem{
 			span{
+				width:100%;
 				display: inline-block;
 				cursor: pointer;
-				background-color: #e0e0e0;
 				white-space: nowrap;
+				color:white;
 				text-align:left;
 			}
 			span:not(:hover){
 				overflow:hidden;
 				text-overflow:ellipsis;
+				background-color:#008d57;
 			}
 			span[state="true"]{
 				background-color:#008d57;
+				border:2px dashed #ffffff;
+				width:calc(100% - 4px);
+				color:white;
 			}
 		}
 	}
 	.rightWindow{
 		right: @containerPadding;
-		width:calc((100% - @leftWindowSize) - @containerPadding);
-		height: 100%;
-		//background-color: #557998;
+		width:calc((100% - @leftWindowSize) - @containerPadding - 8px);
+		height: calc(100% - (@containerPadding*2));
+		padding: 4px;
+		z-index: 1;
 	}
 }
 .topMarigin{
