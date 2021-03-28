@@ -2,13 +2,6 @@
 	<div class="pageContainer">
 		<div class="headerContainer">
 			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
-			<!-- <div class="switchbox" @click="switchToTarget(1)" :style="computedSwicth(1)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(2)" :style="computedSwicth(2)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(3)" :style="computedSwicth(3)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div>
-			<div class="switchbox" @click="switchToTarget(-1)" :style="computedSwicth(-1)"><span>默认</span></div> -->
 			<template v-for="targetData in targetSearchDatas">
 				<div class="switchbox" @click="switchToTarget(targetData.bindID)" :style="computedSwicth(targetData.bindID)"><span>搜索{{targetData.bindID}}</span></div>
 			</template>
@@ -17,7 +10,6 @@
 			<div class="innerContainer">
 				<template v-for="data in searchPageDatas.datas">
 					<div class="resultContainerShow" :state="data.state">
-
 						<div>
 							<!-- 房间的标题 -->
 							<span class="title" @click="toggleRoomTitle(data)" v-if="data.title==data.room" active>
@@ -46,7 +38,7 @@
 						</div>
 						<!-- 存在于房间信息底部的区域 -->
 						<div>
-							<sbutton>申请</sbutton>
+							<sbutton @mdEvent="onApplyRoom(data.room,data.build)">申请</sbutton>
 							<template v-if="userLevel==2">
 								<sbutton @mdEvent="modifyRoom(data)" class="vertical-center">
 									修改
@@ -120,7 +112,7 @@
 				</div>
 			</div>
 			<div class="bgcolor" style="background-color:rgb(251 255 222);opacity: 0.95;"></div>
-			<div class="exit-button" @click="closeModifyRoom()">X</div>
+			<div class="exit-button" @click="setFlowBoxWindowState('modifyBox','hide')">X</div>
 		</div>
 		<div id="addSoftWareBox" class="operateBox" :state="softWareBoxState" v-show="userLevel==2">
 			<div>
@@ -185,7 +177,37 @@
 				</div>
 			</div>
 			<div class="bgcolor" style="background-color:rgb(251 255 222);opacity: 0.95;"></div>
-			<div class="exit-button" @click="toggleAddSoftWareBox('hide')">X</div>
+			<div class="exit-button" @click="setFlowBoxWindowState('addSoftWareBox','hide')">X</div>
+		</div>
+		<div id="applyBox" class="operateBox" :state="applyBoxState">
+			<div>
+				<span class="title" @click="toggleRoomTitle(applyData)" v-if="applyData.title==applyData.room" active>
+					{{applyData.room}}
+				</span>
+				<span class="title" @click="toggleRoomTitle(applyData)" v-else disactive>
+					{{applyData.build}}
+				</span>
+				<br>
+				<div id="fullcalendarContainer">
+					
+				</div>
+				<!-- <span>{{applyData.room}}</span>
+					<span>{{applyData.build}}</span> 
+				-->
+				<!-- <div class="applyDetailContainer">
+					<span>2021.3.6-2021.5.2</span>
+					<span> 11:40-12:40</span>
+					<span> 11:40-12:40</span>
+					<span>周一</span>
+					<span>周二</span>
+					<span>周四</span>
+				</div> -->
+				<!-- <template v-for="useState in applyData.useStateList">
+					{{useState.StartTime}}
+				</template> -->
+			</div>
+			<div class="bgcolor" style="background-color:rgb(251 255 222);opacity: 0.95;" v-show="userLevel==2"></div>
+			<div class="exit-button" @click="setFlowBoxWindowState('applyBox','hide')">X</div>
 		</div>
 		<div class="flowSearchBox" :state="searchBoxState" @click="flowSearchBoxClick()">
 			<form method="post">
@@ -232,7 +254,7 @@
 				<!-- <button @click="reverseForm()">重置</button> -->
 				<sbutton @mdEvent="onSearchClick()">搜索</sbutton>
 				<template v-if="userLevel==2">
-					<sbutton @mdEvent="toggleAddSoftWareBox('show')" class="vertical-center">
+					<sbutton @mdEvent="setFlowBoxWindowState('addSoftWareBox','show')" class="vertical-center">
 						添加
 					</sbutton>
 				</template>
@@ -244,13 +266,23 @@
 	</div>
 </template>
 <script>
+	import '../staticCss/myfullcalendar.css';
 	import $ from "jquery";
 	import vmyInput from "../vue-component/cinput.vue";
 	import sbutton from "../vue-component/sbutton.vue";
 	import exitButton from "../vue-component/exitButton.vue";
 	import webconfig from "../web.config.js";
+	//
+	// import '@fortawesome/fontawesome-free/css/all.css';
 	import md5 from "md5";
+	import { Calendar } from '@fullcalendar/core';
+	import dayGridPlugin from '@fullcalendar/daygrid';
+	import timeGridPlugin from '@fullcalendar/timegrid';
+	import listPlugin from '@fullcalendar/list';
+	import momentPlugin from '@fullcalendar/moment';
+	import bootstrapPlugin from '@fullcalendar/bootstrap';
 	var resultContainer;
+	var _this;
 	export default{
 		components:{
 			vmyInput,
@@ -259,15 +291,17 @@
 		},
 		data(){
 			return {
-				//当前搜索框的状态
+				/*当前搜索框的状态*/
 				searchBoxState:"hide",
-				//当前的焦点是否在搜索框上
+				/*当前的焦点是否在搜索框上*/
 				isFocusOnBoX:false,
-				//离开输入框一秒后开启滑动监听，用来关闭搜索框
+				/*离开输入框一秒后开启滑动监听，用来关闭搜索框*/
 				openScrollWatch:true,
-				softWareBoxState:"hide",//---是否显示添加软件的窗口"show" 或者 "hide"
+				/*---是否显示添加软件的窗口"show" 或者 "hide"*/
+				softWareBoxState:"hide",
 				modifyBoxState:"hide",
-				//----新增软件的数据绑定
+				applyBoxState:"show",
+				/*----新增软件的数据绑定------*/
 				tData:{
 					room:"",
 					build:"",
@@ -282,7 +316,7 @@
 					//{name:"Hello world1",system:"13456",id:"1"},
 					],
 				},
-				//----修改数据的临时容器
+				/*----修改数据的临时容器*/
 				modifyData:{
 					room:"",
 					build:"",
@@ -295,7 +329,7 @@
 					savesystem:false,
 					softwares:[],//原始的软件列表
 				},
-				//搜索框数据绑定
+				/*搜索框数据绑定*/
 				searchData:{
 					softwareName:"",
 					room:"",
@@ -328,6 +362,13 @@
 						this.timeSpan.push({start:"",end:""});
 					},
 				},
+				applyData:{
+					room:"",
+					build:"",
+					title:"",
+					useStateList:[],
+				},
+				/*当前的显示目标*/
 				target:-1,
 			}
 		},
@@ -356,6 +397,40 @@
 			},
 		},
 		methods:{
+			onApplyRoom(room,build){
+				let formData=new FormData();
+				let skeys=$.cookie('skeys');
+				let account=$.cookie('account');
+				let opreate="applySearch";
+				let md5value=md5(account+room+build+opreate+skeys);
+				_this.axios({
+					method: 'get',
+					url: webconfig.address()+"api/Search",
+					params:{
+						"account":account,
+						build,
+						room,
+						md5value,
+						opreate
+					}
+				}).then(res=>{
+					console.log(res);
+					if(res.data.code==="200"){
+						_this.applyData.room=room;
+						_this.applyData.title=room;
+						_this.applyData.build=build;
+						_this.applyData.useStateList.splice(0);
+						res.data.data.forEach(item=>{
+							_this.applyData.useStateList.push(item);
+						});
+						_this.applyBoxState="show";
+					}else{
+						_this.$store.commit("addPromtMessage","获取信息发生异常 : "+res.data.msg);
+					}
+				}).catch(ex=>{
+					_this.$store.commit("addPromtMessage","获取信息发生异常 : "+ex.message);
+				});
+			},
 			computedSwicth(index){
 				if(index==this.target){
 					return "background-color:#008D57;color:white;";
@@ -409,21 +484,6 @@
 					_this.openScrollWatch=true;
 				}, 1000);
 			},
-			//搜索表单里面的添加时间段
-			addTimeSpan(){
-				
-				// let ele=this.timeSpanEle.clone();
-				// let exitButton=document.createElement("span");//
-				// exitButton.innerHTML="X";
-				// exitButton.setAttribute("class","deleteButton");
-				// exitButton.onclick = ()=> {
-				// 	ele.remove();
-				// };//这里是点了叉叉以后关闭
-				// ele.append(exitButton);
-				// this.newTimeSpanList.push(ele);
-				// let button=this.timeSpanButton;
-				// button.before(ele);
-			},
 			//处理结果的页数
 			resultItemPageNext(obj){
 				//这里是直接操作对象
@@ -440,10 +500,6 @@
 				}else{
 					this.$store.commit('addPromtMessage',"这里是开始的地方！！！");
 				}
-			},
-			//显示或隐藏添加元素的窗口
-			toggleAddSoftWareBox(value){
-				this.softWareBoxState=value;
 			},
 			//添加元素的时候，从元素列表中删除元素
 			delteFromtsoftwares(value){
@@ -596,38 +652,6 @@
 							case "modifySoftware":
 							_this.$store.commit('addPromtMessage',"更新成功");
 							_this.$store.commit("opreateRoom",{room,build,"opreate":"modifySoftware","version":result.data.version,"data":data});
-							// try{
-
-							// 	// _this.searchPageDatas.datas.forEach(item=>{
-							// 	// 	if(item.build==data.build&&item.room==data.room){
-							// 	// 		item.softwares.datas.splice(0,item.softwares.datas.length);
-							// 	// 		data.softwares.forEach(item1=>{
-							// 	// 			item.softwares.datas.push(item1);
-							// 	// 		});
-							// 	// 		item.softwares.total=item.softwares.datas.length;
-							// 	// 		item.softwares.pageSize=4;
-							// 	// 		item.softwares.currentPage=1;
-							// 	// 		let pageCompute=1;
-							// 	// 		let currentpage=1;
-							// 	// 		item.softwares.maxPage=Math.ceil(item.softwares.total/item.softwares.pageSize);
-							// 	// 		item.softwares.datas.forEach(item2=>{
-
-							// 	// 			item2.page=currentpage;
-							// 	// 			item2.state="normal";
-							// 	// 			if(pageCompute!=0&&pageCompute%4==0){
-							// 	// 				currentpage++;
-							// 	// 			}
-							// 	// 			pageCompute++;
-							// 	// 		});
-							// 	// 		item.appendMsg=data.appendMsg;
-							// 	// 		item.useable=data.useable;
-							// 	// 		item.peopleCpa=data.peopleCpa;
-							// 	// 		throw new Error("退出循环");
-							// 	// 	}
-							// 	// });
-							// }catch(ex){
-							// 	console.log(ex);
-							// }
 							break;
 							case "newSoftware":
 							_this.$store.commit('addPromtMessage',"上传成功");
@@ -635,7 +659,7 @@
 							let choice=window.confirm("是否保留信息继续添加");
 							//如果不保存信息
 							if (!choice) {
-								_this.toggleAddSoftWareBox('hide');
+								_this.setFlowBoxWindowState('addSoftWareBox','hide');
 								_this.resetSoftwareMsgWindow(false);
 							}
 							break;
@@ -650,7 +674,6 @@
 			},
 			//删除房间的信息 ！！！此操作不可以撤销
 			deleteRoom(data){
-				let _this=this;
 				let choice=window.confirm("是否删除此房间，此操作不可撤销");
 				//如果不保存信息
 				if (!choice) {
@@ -712,8 +735,18 @@
 				});
 				this.modifyBoxState="show";
 			},
-			closeModifyRoom(){
-				this.modifyBoxState="hide";
+			setFlowBoxWindowState(target,value){
+				switch(target){
+					case "modifyBox":
+					this.modifyBoxState=value;
+					break;
+					case "addSoftWareBox":
+					this.softWareBoxState=value;
+					break;
+					case "applyBox":
+					this.applyBoxState=value;
+					break;
+				}
 			},
 			toggleRoomTitle(data){
 				if(data.title==data.build)
@@ -723,8 +756,48 @@
 			},
 		},
 		mounted(){
-			let _this=this;
+			_this=this;
 			_this.searchData.reverse();
+
+			/*设置日历*/
+			let calendarEl =document.getElementById("fullcalendarContainer"); 
+			let calendar = new Calendar(calendarEl, {
+				plugins: [ dayGridPlugin, timeGridPlugin, listPlugin,momentPlugin],
+				initialView: 'dayGridMonth',
+				headerToolbar: {
+					left: 'prev,today',
+					center: 'title',
+					right:'next'
+					// right: 'dayGridMonth,timeGridWeek,listWeek'
+				},
+				views: {
+					dayGridMonth: {
+						titleFormat:"YYYY - MM"
+					}
+				},
+				windowResize: function(arg) {
+					calendar.setOption('height', $("#applyBox").height()-150);
+					calendar.setOption('aspectRatio',  ($("#applyBox").height()-150)/ ($("#applyBox").width()-20));
+					this.updateSize();
+					calendar.render();
+					//alert('The calendar has adjusted to a window resize. Current view: ' + arg.view.type);
+				}
+			});
+			calendar.setOption('height', $("#applyBox").height()-150);
+			calendar.setOption('aspectRatio',  ($("#applyBox").height()-150)/ ($("#applyBox").width()-20));
+			calendar.render();
+			calendar.addResource({
+				id: 'e',
+				title: 'Room E'
+			});
+			// calendar.changeView('timeGrid', {
+			// 	start: '2020-7-01',
+			// 	end:  '2020-9-01',
+			// });
+			/********/
+
+
+			/*滑动监听*/
 			resultContainer=$(".resultContainer")[0];
 			resultContainer.onscroll=()=>{
 				//隐藏搜索框
@@ -741,10 +814,13 @@
 					}
 				}
 			};
+			/*滑动监听*/
+
 			/*用于第一次加载页面的时候获取数据*/
 			if(_this.searchPageDatas.currentPage==0&&_this.searchPageDatas.version==0){
 				_this.$store.commit("getData",{opreate:"init"});
 			}
+			/******************/
 		},
 		beforeRouteLeave(to, from, next){
 			resultContainer.onscroll=null;
@@ -766,6 +842,7 @@
 @resultContainerPadding:5px;
 @resultContainerMarginTop:5px;
 @resultContainerHeight:100% - @resultContainerPadding*2 - @headerContainerHeight - @resultContainerMarginTop;
+@resultContainer_innerContainerPaddingLeft:15px;
 @keyframes rotateSingleRound
 {
 	from {transform:rotateX(0deg)}
@@ -811,9 +888,11 @@
 	height:calc(@resultContainerHeight);
 	padding: @resultContainerPadding;
 	margin-top: @resultContainerMarginTop;
+	width:calc(100% -  @resultContainerPadding*2);
 	.innerContainer{
-		width: 100%;
+		width: calc(100% - @resultContainer_innerContainerPaddingLeft);
 		min-height: calc(100% + 10px);
+		padding-left: @resultContainer_innerContainerPaddingLeft;
 		.resultContainerShow{
 			display: inline-block;
 			vertical-align:top;
@@ -829,18 +908,6 @@
 			div:nth-child(1){
 				width: 100%;
 				height: calc(100% - 30px);
-				.title{
-					width: 100%;
-					font-size: 25px;
-					display: inline-block;
-					font-weight: bold;
-					text-align: center;
-					background-color: #1aaaaf;
-					transition: all 0.5s;
-				}
-				.title[active]{
-					transform: rotateX(360deg);
-				}
 				.smallTitle{
 					width: 100%;
 					font-size: 15px;
@@ -918,6 +985,18 @@
 		}
 	}
 }
+.title{
+	width: 100%;
+	font-size: 25px;
+	display: inline-block;
+	font-weight: bold;
+	text-align: center;
+	background-color: #1aaaaf;
+	transition: all 0.5s;
+}
+.title[active]{
+	transform: rotateX(360deg);
+}
 .flowSearchBox{
 	position: fixed;
 	z-index: 2;
@@ -928,7 +1007,7 @@
 	transition: all 0.5s ease 0s;
 	@media @phoneSize{
 		width:calc(100% - 40px);
-		padding: 10px 20px;
+		padding: 10px;
 		top: 150px;
 	}
 	@media @min624{
@@ -1010,11 +1089,16 @@
 	z-index: 3;
 	height: calc(100% - 150px);
 	top: 100px;
-	transition: all 0.5s;
+	
 	font-size: 20px;
 	text-align: left;
 	padding: 10px;
 	white-space:nowrap;
+	width: 600px;
+	left: calc(50% - 300px);
+	.operateBox[state="hide"]{
+		transform: translateX(2000px);
+	}
 	input[type="text"]{
 		vertical-align: middle;
 		width: 100px;
@@ -1023,13 +1107,6 @@
 		width: 90%;
 		left: 2%;
 		
-	}
-	@media @min624{
-		width: 600px;
-		left: calc(50% - 300px);
-		.operateBox[state="hide"]{
-			transform: translateX(2000px);
-		}
 	}
 
 	// 按钮哪里设置成居中
@@ -1097,6 +1174,7 @@
 	}
 }
 .operateBox[state="hide"]{
+	transition: all 0.5s;
 	@media @phoneSize {
 		transform: translateX(700px);
 	} 
@@ -1105,7 +1183,28 @@
 	}
 }
 .operateBox[state="show"]{
+	transition: all 0.5s;
 	transform: translateX(0);
 }
-
+#applyBox{
+	.applyDetailContainer{
+		display: flex;
+		flex-direction: row; 
+		overflow: auto;
+		width: calc(100% - 4px);
+		height: 60px;
+		padding: 2px;
+		span{
+			vertical-align: middle;
+			height: 28px;
+			padding:8px 0px;
+			background-color: #aaffaa;
+			margin:0px 5px;
+		}
+	}
+	#fullcalendarContainer{
+		width: 100%;
+		height: 100%;
+	}
+}
 </style>

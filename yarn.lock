@@ -17,6 +17,69 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@fortawesome/fontawesome-free@^5.15.3":
+  version "5.15.3"
+  resolved "https://registry.npm.taobao.org/@fortawesome/fontawesome-free/download/@fortawesome/fontawesome-free-5.15.3.tgz#c36ffa64a2a239bf948541a97b6ae8d729e09a9a"
+  integrity sha1-w2/6ZKKiOb+UhUGpe2ro1yngmpo=
+
+"@fullcalendar/bootstrap@^5.5.0":
+  version "5.5.0"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/bootstrap/download/@fullcalendar/bootstrap-5.5.0.tgz#0d2a06123b1e5ccd98c3f724c3c12b09bf0abf01"
+  integrity sha1-DSoGEjseXM2Yw/ckw8ErCb8KvwE=
+  dependencies:
+    "@fullcalendar/common" "~5.5.0"
+    tslib "^2.0.3"
+
+"@fullcalendar/common@~5.5.0":
+  version "5.5.1"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/common/download/@fullcalendar/common-5.5.1.tgz#cc3679408b625b35d6f3f05bdca73f3700d0d370"
+  integrity sha1-zDZ5QItiWzXW8/Bb3Kc/NwDQ03A=
+  dependencies:
+    ical.js "^1.4.0"
+    tslib "^2.0.3"
+
+"@fullcalendar/core@^5.5.1":
+  version "5.5.1"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/core/download/@fullcalendar/core-5.5.1.tgz?cache=0&sync_timestamp=1610816407345&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40fullcalendar%2Fcore%2Fdownload%2F%40fullcalendar%2Fcore-5.5.1.tgz#310adf23d5323b435a00f7df6f68eaf2f6087f39"
+  integrity sha1-MQrfI9UyO0NaAPffb2jq8vYIfzk=
+  dependencies:
+    "@fullcalendar/common" "~5.5.0"
+    preact "^10.0.5"
+    tslib "^2.0.3"
+
+"@fullcalendar/daygrid@^5.5.0", "@fullcalendar/daygrid@~5.5.0":
+  version "5.5.0"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/daygrid/download/@fullcalendar/daygrid-5.5.0.tgz#48f943d070a07f88cd6f8170fb757d3038239bd6"
+  integrity sha1-SPlD0HCgf4jNb4Fw+3V9MDgjm9Y=
+  dependencies:
+    "@fullcalendar/common" "~5.5.0"
+    tslib "^2.0.3"
+
+"@fullcalendar/list@^5.5.0":
+  version "5.5.0"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/list/download/@fullcalendar/list-5.5.0.tgz#8bc1523ad08e439cde366697acebe8bc4cf2fe5f"
+  integrity sha1-i8FSOtCOQ5zeNmaXrOvovEzy/l8=
+  dependencies:
+    "@fullcalendar/common" "~5.5.0"
+    tslib "^2.0.3"
+
+"@fullcalendar/moment@^5.5.0":
+  version "5.5.0"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/moment/download/@fullcalendar/moment-5.5.0.tgz#687009d08e5d18ce8d6ee91aad2d806fddf8c70e"
+  integrity sha1-aHAJ0I5dGM6NbukarS2Ab934xw4=
+  dependencies:
+    "@fullcalendar/common" "~5.5.0"
+    tslib "^2.0.3"
+
+"@fullcalendar/timegrid@^5.5.1":
+  version "5.5.1"
+  resolved "https://registry.npm.taobao.org/@fullcalendar/timegrid/download/@fullcalendar/timegrid-5.5.1.tgz#b73eb9e454808313e7146dc5df6105e9b3aa80cb"
+  integrity sha1-tz655FSAgxPnFG3F32EF6bOqgMs=
+  dependencies:
+    "@fullcalendar/common" "~5.5.0"
+    "@fullcalendar/daygrid" "~5.5.0"
+    tslib "^2.0.3"
+
 "@webpack-cli/info@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npm.taobao.org/@webpack-cli/info/download/@webpack-cli/info-1.1.0.tgz#c596d5bc48418b39df00c5ed7341bf0f102dbff1"
@@ -901,6 +964,11 @@ boolbase@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npm.taobao.org/boolbase/download/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
+
+bootstrap@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.npm.taobao.org/bootstrap/download/bootstrap-4.6.0.tgz?cache=0&sync_timestamp=1616517464188&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fbootstrap%2Fdownload%2Fbootstrap-4.6.0.tgz#97b9f29ac98f98dfa43bf7468262d84392552fd7"
+  integrity sha1-l7nymsmPmN+kO/dGgmLYQ5JVL9c=
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -2949,6 +3017,11 @@ human-signals@^1.1.1:
   resolved "https://registry.npm.taobao.org/human-signals/download/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
   integrity sha1-xbHNFPUK6uCatsWf5jujOV/k36M=
 
+ical.js@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npm.taobao.org/ical.js/download/ical.js-1.4.0.tgz#fc5619dc55fe03d909bf04362aa0677f4541b9d7"
+  integrity sha1-/FYZ3FX+A9kJvwQ2KqBnf0VBudc=
+
 iconv-lite@0.4.24:
   version "0.4.24"
   resolved "https://registry.npm.taobao.org/iconv-lite/download/iconv-lite-0.4.24.tgz?cache=0&sync_timestamp=1594184250387&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ficonv-lite%2Fdownload%2Ficonv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -3905,6 +3978,11 @@ mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@^0.5.5, mkdirp@~0.5.0:
   dependencies:
     minimist "^1.2.5"
 
+moment@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.npm.taobao.org/moment/download/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha1-sr52n6MZQL6e7qZGnAdeNQBvo9M=
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/move-concurrently/download/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -4530,6 +4608,11 @@ postcss@^6.0.8:
     chalk "^2.4.1"
     source-map "^0.6.1"
     supports-color "^5.4.0"
+
+preact@^10.0.5:
+  version "10.5.13"
+  resolved "https://registry.npm.taobao.org/preact/download/preact-10.5.13.tgz?cache=0&sync_timestamp=1615757263952&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fpreact%2Fdownload%2Fpreact-10.5.13.tgz#85f6c9197ecd736ce8e3bec044d08fd1330fa019"
+  integrity sha1-hfbJGX7Nc2zo477ARNCP0TMPoBk=
 
 preserve@^0.2.0:
   version "0.2.0"
@@ -5729,6 +5812,11 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/trim-right/download/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
+
+tslib@^2.0.3:
+  version "2.1.0"
+  resolved "https://registry.npm.taobao.org/tslib/download/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
+  integrity sha1-2mCGDxwuyqVwOrfTm8Bba/mIuXo=
 
 tty-browserify@0.0.0:
   version "0.0.0"

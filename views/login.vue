@@ -13,15 +13,11 @@
 	import $ from "jquery";
 	import $cookie from "jquery.cookie";
 	import webconfig from "../web.config.js";
+	import myTools from '../link/myTools.js';
 	import md5 from "md5";
 	export default{
 		components:{
 			vLoginBox,
-		},
-		data(){
-			return {
-				
-			}
 		},
 		methods:{
 			handleLogin(info){
@@ -65,79 +61,45 @@
 						//_this.$store.commit('addPromtMessage',result.error);
 					}
 				}).catch(error=>{
-					_this.$store.commit('addPromtMessage',"ERROR");
-					console.log(error);
+					_this.$store.commit('addPromtMessage',"网络错误无法与服务器通讯");
 				});
-				/*this.axios.post(config.address()+"api/login",{
-					params: {
-						account:info.account,
-						rgtoken:info.rgToken,
-						password:passwordMD5,
-					}
-				}).then((response) => {
-					let result=response.data;
-					if(result.code=="200"){
-						let skeys=result.data.skeys;
-						let account=result.data.account;
-						$.cookie('account', account, { expires: 1 });
-						$.cookie('skeys', skeys, { expires: 1 });
-						$.cookie('isLogin', true);
-						_this.$store.commit('refreshPage');
-						_this.$router.push('/index');
-						_this.$store.commit('initIndexMessage',result.result);
-						_this.$store.commit('initUser',result.data);
-					}else{
-						console.log(result);
-						$.removeCookie("account");
-						$.removeCookie("skeys");
-						_this.$store.commit('addPromtMessage',result.msg);
-						//_this.$router.push('/login');
-						//_this.$store.commit('addPromtMessage',result.error);
-					}
-				}).catch(error=>{
-					_this.$store.commit('addPromtMessage',"ERROR");
-					console.log(error);
-				});*/
 			}
 		},
 		mounted(){
 			/*添加新浪的ip地址查询  {"cip": "116.22.135.37", "cid": "440106", "cname": "广东省广州市天河区"}->>>使用方法returnCitySN[cip]*/
-			const s = document.createElement('script');
-			s.type = 'text/javascript';
-			s.src = 'http://pv.sohu.com/cityjson?ie=utf-8';
-			document.body.append(s);
+			myTools.loadScript('http://pv.sohu.com/cityjson?ie=utf-8').then(result=>{
+				 /*进行登陆判断*/
+			    let skeys=$.cookie('skeys');
+			    let account=$.cookie('account');
+			    let _this=this;
+			    if(skeys&&account){
+			    	let md5Skeys=md5(account+skeys);
+			    	this.axios({
+			    		method: 'get',
+			    		url: webconfig.address()+"api/login",
+			    		params:{
+			    			"account":account,
+			    			"md5value":md5Skeys,
+			    		}
+			    	}).then(response=>{
+			    		let result=response.data;
+			    		if(result.code==="200"){
+							$.cookie('isLogin', true);//登陆成功
+							_this.$router.push('/index');
+							_this.$store.commit('initUser',result.data.user);
+							_this.$store.commit('initIndexMessage',result.data.indexMessge);
+						}else{
+							$.removeCookie("account");
+							$.removeCookie("skeys");
+							_this.$store.commit('addPromtMessage',"登陆过期");
+							_this.$router.push('/login');
+						}
+					});
+				}
+			}).catch(ex=>{
+				console.log("加载失败");
+			});
 			/*************************/
-
-
-
-			/*进行登陆判断*/
-			let skeys=$.cookie('skeys');
-			let account=$.cookie('account');
-			let _this=this;
-			if(skeys&&account){
-				let md5Skeys=md5(account+skeys);
-				this.axios({
-					method: 'get',
-					url: webconfig.address()+"api/login",
-					params:{
-						"account":account,
-						"md5value":md5Skeys,
-					}
-				}).then(response=>{
-					let result=response.data;
-					if(result.code==="200"){
-						$.cookie('isLogin', true);//登陆成功
-						_this.$router.push('/index');
-						_this.$store.commit('initUser',result.data.user);
-						_this.$store.commit('initIndexMessage',result.data.indexMessge);
-					}else{
-						$.removeCookie("account");
-						$.removeCookie("skeys");
-						_this.$store.commit('addPromtMessage',"登陆过期");
-						_this.$router.push('/login');
-					}
-				});
-			}///注释内容
 		}
 	}
 </script>

@@ -81,7 +81,6 @@
 					method: 'post',
 					url: webconfig.address()+"api/webset",
 					data: formData,
-					params: formData,
 					transformRequest: [
 					function(){
 						return formData;

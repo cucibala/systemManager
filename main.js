@@ -12,7 +12,7 @@ axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
-var test=true;
+var test=false;
 function baseDull(array){
 	array.forEach(item=>{
 		try{
@@ -72,203 +72,203 @@ const store=new Vuex.Store({
 			col:0,
 			//房间列表
 			datas:[
-			{
-				room:"406",
-				build:"阿斯顿线程",
-				state:"able",
-				title:"406",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
+			// {
+			// 	room:"406",
+			// 	build:"阿斯顿线程",
+			// 	state:"able",
+			// 	title:"406",
+			// 	softwares:{
+			// 		total:7,
+			// 		pageSize:4,
+			// 		currentPage:1,
+			// 		maxPage:2,
+			// 		datas:[
+			// 		{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+			// 		{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+			// 		{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+			// 		{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+			// 		{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+			// 		{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+			// 		{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+			// 		]
+			// 	},
+			// },
 			],
 		},
 		targetSearchDatas:[
-		{
-			bindID:0,
-			datas:[
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			],
-		},
+		// {
+		// 	bindID:0,
+		// 	datas:[
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	{
+		// 		room:"407",
+		// 		build:"祝线程",
+		// 		state:"able",
+		// 		title:"407",
+		// 		softwares:{
+		// 			total:7,
+		// 			pageSize:4,
+		// 			currentPage:1,
+		// 			maxPage:2,
+		// 			datas:[
+		// 			{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
+		// 			{name:"QQ","id":"2",type:"target",page:1,sytem:""},
+		// 			{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
+		// 			{name:"CDA","id":"4",type:"other",page:1,sytem:""},
+		// 			{name:"QQ","id":"5",type:"other",page:2,sytem:""},
+		// 			{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
+		// 			{name:"CDA","id":"7",type:"other",page:2,sytem:""},
+		// 			]
+		// 		},
+		// 	},
+		// 	],
+		// },
 		]
 	},
 	mutations:{
@@ -309,13 +309,18 @@ const store=new Vuex.Store({
 			state.browserProtype.width=value.width;
 			state.browserProtype.height=value.height;
 
-			/*目前的手机端搜索页面显示的宽度是150px 大于620px的显示器宽度为200px 高度均为306px*/
+			
+			/*5+43+90 innerContainer的高度等于 总container-pagecontainer的上边距-头部选择-resultcontainer的上边距*/
+
 			let col;
-			let row=Math.ceil((value.height-30)/(306+10));
+			let row=Math.floor((value.height-138)/(306+15));
+			if((value.height-138)%(306+15)>120){
+				row++;
+			}
 			if(value.width<620){
-				col=parseInt((value.width*0.9-20)/(150+8));
+				col=Math.floor((value.width)/(156));
 			}else{
-				col=parseInt((value.width*0.9-20)/(200+8));
+				col=Math.floor((value.width*0.9-20)/(200+8));
 			}
 			//每一页最多包含的页数
 			state.searchPageDatas.pageSize=col*row;
@@ -453,7 +458,7 @@ const store=new Vuex.Store({
 			}else{
 				ts='null';
 			}
-			let md5Skeys=md5(account+state.searchPageDatas.version+state.searchPageDatas.currentTotal+state.searchPageDatas.pageSize+skeys);
+			let md5Skeys=md5(account+state.searchPageDatas.version+state.searchPageDatas.currentTotal+state.searchPageDatas.pageSize+"getData"+skeys);
 			axios({
 				method: 'get',
 				url: webconfig.address()+"api/Search",
@@ -464,6 +469,7 @@ const store=new Vuex.Store({
 					"currentTotal":state.searchPageDatas.currentTotal,
 					"pageSize":state.searchPageDatas.pageSize,
 					"md5value":md5Skeys,
+					"opreate":"getData",
 				}
 			}).then(response=>{
 				let result=response.data;

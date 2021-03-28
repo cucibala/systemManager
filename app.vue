@@ -130,12 +130,19 @@
 
 			let width=$(window).width()-20;
 			let height=$(window).height()-20;
+			if(width<360){
+				width=360;
+			}
 			$("#mainContainer").height(height);
 			$("#mainContainer").width(width);
+
 			_this.$store.commit('updateBrowerPortype',{width,height});
 			window.onresize=()=>{
 				width=$(window).width()-20;
 				height=$(window).height()-40;
+				if(width<360){
+					width=360;
+				}
 				$("#mainContainer").height(height);
 				$("#mainContainer").width(width);
 				_this.$store.commit('updateBrowerPortype',{width,height});
