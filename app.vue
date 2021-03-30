@@ -203,7 +203,7 @@ ul,dl,ol, li{
 }
 .no-padding{
 	padding: 0px;
-} 
+}
 .align-right{
 	text-align: right;
 }
@@ -255,5 +255,12 @@ input[type="reset"]{
 	text-align: left;
 	margin-top: 10px;
 	padding-left: 61.8%;
+}
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
 }
 </style>

@@ -140,7 +140,7 @@
 			}
 			img{
 				@media @pcSize{
-					
+
 					position: absolute;
 					height: 821px;
 					right: 0px;
@@ -201,7 +201,7 @@
 			}
 			.previous{
 				left: 0px;
-				
+
 			}
 			.next{
 				right: 0px;
