@@ -364,22 +364,29 @@ export default{
                 build:"",
                 title:"",
                 useStateList:[{
-                    name:"zzl",
+                    name:"张三",
                     year:2021,
-                    startMonth:2,
-                    endMonth:9,
-                    week:[true,true,false,true,false,true,true]
+                    startMonth:1,
+                    endMonth:3,
+                    week:[true,false,false,true,false,true,true]
+                },
+                {
+                    name:"张牛",
+                    year:2021,
+                    startMonth:1,
+                    endMonth:3,
+                    week:[true,false,false,true,false,true,true]
                 },{
-                    name:"zsl",
+                    name:"李四",
                     year:2021,
                     startMonth:2,
-                    endMonth:9,
-                    week:[true,true,false,false,false,true,true]
+                    endMonth:6,
+                    week:[true,true,true,false,false,true,false]
                 },{
-                    name:"cuci",
+                    name:"王五",
                     year:2021,
-                    startMonth:2,
-                    endMonth:9,
+                    startMonth:9,
+                    endMonth:10,
                     week:[true,true,false,false,false,true,true]
                 }],
             },
