@@ -188,7 +188,7 @@
             </span>
             <br>
             <div id="fullcalendarContainer">
-                <calendar></calendar>
+                <calendar :dataBase="applyData.useStateList"></calendar>
             </div>
             <!-- <span>{{applyData.room}}</span>
             <span>{{applyData.build}}</span> -->
@@ -201,7 +201,7 @@
             <span>周四</span></div> -->
             <!-- <template v-for="useState in applyData.useStateList">
             {{useState.StartTime}}</template> -->
-            <div class="bgcolor" style="background-color:rgb(251 255 222);opacity: 0.95;"></div>
+            <div class="bgcolor" style="background-color:rgb(255 255 255);opacity: 0.95;"></div>
             <div class="exit-button" @click="setFlowBoxWindowState('applyBox','hide')">X</div>
         </div>
         <div class="flowSearchBox" :state="searchBoxState" @click="flowSearchBoxClick()">
@@ -363,7 +363,25 @@ export default{
                 room:"",
                 build:"",
                 title:"",
-                useStateList:[],
+                useStateList:[{
+                    name:"zzl",
+                    year:2021,
+                    startMonth:2,
+                    endMonth:9,
+                    week:[true,true,false,true,false,true,true]
+                },{
+                    name:"zsl",
+                    year:2021,
+                    startMonth:2,
+                    endMonth:9,
+                    week:[true,true,false,false,false,true,true]
+                },{
+                    name:"cuci",
+                    year:2021,
+                    startMonth:2,
+                    endMonth:9,
+                    week:[true,true,false,false,false,true,true]
+                }],
             },
             /*当前的显示目标*/
             target:-1,
