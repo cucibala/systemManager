@@ -44,20 +44,26 @@ function baseDull(array){
 }
 const store=new Vuex.Store({
 	state:{
-		Temp:"Hello wrold",
+        //是否显示MenuBar
 		showMenuBar:true,
+        //首页的图片地址
 		indexImages:"",
 		user:"",
+        //flag
 		refreshPage:false,
+        //当前提示的消息
 		currentPromtMessage:"",
+        //提示窗口的信号值，改变的时候提示窗口会激活
 		promtMessageSign:true,
 		//当前是否正在获取数据
 		isGettingData:false,
+        //浏览器的属性宽高 目的：避免太多的时间监听
 		browserProtype:{
 			width:1920,
 			height:1080,
 		},
-		searchPageDatas:{
+        //搜索界面的数据，全局避免每次进入都请求服务器
+        searchPageDatas:{
 			//版本
 			version:"0",
 			//最大的房间数
@@ -95,6 +101,7 @@ const store=new Vuex.Store({
 			},
 			],
 		},
+        //搜索界面发生搜索时的数据保存数组
 		targetSearchDatas:[
 		{
 			bindID:0,
@@ -272,6 +279,7 @@ const store=new Vuex.Store({
 		]
 	},
 	mutations:{
+        //初始化首页的信息
 		initIndexMessage(state,obj){
 			obj.forEach((x,index)=>{
 				if(index!=0){
@@ -288,6 +296,7 @@ const store=new Vuex.Store({
 			});
 			state.indexImages=obj;
 		},
+        //初始化用户信息 name level
 		initUser(state,obj){
 			state.user=obj;
 		},
@@ -347,6 +356,7 @@ const store=new Vuex.Store({
 				state.searchPageDatas.datas.push(item);
 			});
 		},
+        //设置搜索界面每一个小卡片的大小
 		setCurrentSize(state,value){
 			state.searchPageDatas.currentPage=value;
 		},
@@ -441,6 +451,7 @@ const store=new Vuex.Store({
 				break;
 			}
 		},
+        //获取数据 可以带有ts没有ts则返回所有数据  ts搜索目标
 		getData(state,value){
 			if(state.isGettingData){
 				console.log("等待当前结果");

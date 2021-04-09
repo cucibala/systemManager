@@ -577,7 +577,7 @@ export default{
 
             });
 
-            //3.计算剩余个数
+            //3.计算无法显示出来的个数
             this.dateCellWeekDay.forEach((item, i) => {
                 if(item.occupy.length>2){
                     item.remain=item.occupy.length-2;
