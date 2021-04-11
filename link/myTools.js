@@ -21,7 +21,7 @@ export default{
 	 */
 	compareTime(time1,time2){
 		if(!time1||!time1){
-			alert("输入不能为空");
+			console.log("输入不能为空");
 			return -1;
 		}
 		
@@ -29,7 +29,7 @@ export default{
 		var time2Splite=time2.split(":");
 		var result=0;
 		if(time1Splite.length!==2||time2Splite.length!==2){
-			alert("输入格式不正确");
+			console.log("输入格式不正确",time1Splite,time2Splite)
 			return -1;
 		}
 		
@@ -40,8 +40,8 @@ export default{
 			
 			var t1=Number(time1Splite.shift());
 			var t2=Number(time2Splite.shift());
-			if(!t1||!t2){
-				alert("输入格式不正确");
+			if((t1!=0&&!t1)||(t2!=0&&!t2)){
+				console.log("输入格式不正确",t1,t2)
 				return -1;
 			}
 			
@@ -70,7 +70,7 @@ export default{
 	 */
 	compareDate(date1,date2){
 		if(!date1||!date2){
-			alert("输入不能为空");
+			console.log("输入不能为空");
 			return -1;
 		}
 		
@@ -78,7 +78,7 @@ export default{
 		var date2Splite=date2.split("-");
 		var result=0;
 		if(date1Splite.length!==3||date2Splite.length!==3){
-			alert("输入格式不正确");
+			console.log("输入格式不正确",date1Splite,date2Splite);
 			return -1;
 		}
 		
@@ -89,8 +89,8 @@ export default{
 			
 			var t1=Number(date1Splite.shift());
 			var t2=Number(date2Splite.shift());
-			if(!t1||!t2){
-				alert("输入格式不正确");
+			if((t1!=0&&!t1)||(t2!=0&&!t2)){
+				console.log("输入格式不正确",t1,t2);
 				return -1;
 			}
 			

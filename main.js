@@ -59,7 +59,6 @@ function baseDull(array){
 				pageCompute++;
 			});
 			tempsoftwares.datas=item.softwares;
-			item.state="able";
 			item.softwares=tempsoftwares;
 			item.title=item.room;
 		}catch(exception){
@@ -333,6 +332,7 @@ const store=new Vuex.Store({
 							_this.commit("addPromtMessage","没有找到匹配项");
 							return;
 						}
+						
 						let arraylegnth=state.targetSearchDatas.length;
 						let datas=[];
 						let array=baseDull(data.data);

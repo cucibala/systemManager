@@ -220,56 +220,56 @@
             <div class="bgcolor" style="background-color:rgb(255 255 255);opacity: 0.95;"></div>
             <div class="exit-button" @click="applyManager.setApplyContainer('hide')">X</div>
         </div>
-        <div class="flowSearchBox" :state="searchBoxState" @click="flowSearchBoxClick()">
+        <div class="flowSearchBox" :state="searchManager.windowState" @click="searchManager.setWindowState('show')">
             <form method="post">
                 <div class="inputContainer">
-                    <vmy-input ctitle="软件名" ctype="1" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'softwareName')" :clearSign="searchData.clearSign"></vmy-input>
+                    <vmy-input ctitle="软件名" ctype="1" @onFocus="searchManager.setFocus(true)" @lostFocus="searchManager.setFocus(false)" @valueChange="searchManager.setData($event,'softwareName')" :clearSign="searchManager.clearSign"></vmy-input>
                 </div>
                 <div class="inputContainer">
-                    <vmy-input ctitle="教室" ctype="2" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'room')" :clearSign="searchData.clearSign"></vmy-input>
-                    <vmy-input ctitle="教学楼" ctype="2" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'build')" :clearSign="searchData.clearSign"></vmy-input>
+                    <vmy-input ctitle="教室" ctype="2" @onFocus="searchManager.setFocus(true)" @lostFocus="searchManager.setFocus(false)" @valueChange="searchManager.setData($event,'room')" :clearSign="searchManager.clearSign"></vmy-input>
+                    <vmy-input ctitle="教学楼" ctype="2" @onFocus="searchManager.setFocus(true)" @lostFocus="searchManager.setFocus(false)" @valueChange="searchManager.setData($event,'build')" :clearSign="searchManager.clearSign"></vmy-input>
                 </div>
                 <div class="inputContainer">
-                    <vmy-input ctitle="人数" ctype="3" @onFocus="focusOnSearchBox()" @lostFocus="blurOnSearchBox()" @valueChange="oninputValueChange($event,'peopleCpa')" :clearSign="searchData.clearSign"></vmy-input>
+                    <vmy-input ctitle="人数" ctype="3" @onFocus="searchManager.setFocus(true)" @lostFocus="searchManager.setFocus(false)" @valueChange="searchManager.setData($event,'peopleCpa')" :clearSign="searchManager.clearSign"></vmy-input>
                 </div>
                 <div class="inputContainer1">
-                    <label>开始日期:</label><input  type="date" v-model="searchData.startDate"/>
+                    <label>开始日期:</label><input  type="date" v-model="searchManager.data.startDate"/>
                 </div>
                 <div class="inputContainer1">
-                    <label>结束日期:</label><input  type="date" v-model="searchData.endDate" :min="searchData.startDate"/>
+                    <label>结束日期:</label><input  type="date" v-model="searchManager.data.endDate" :min="searchManager.data.startDate"/>
                 </div>
                 <div class="inputContainer1" id="timeSpanInput">
                     <div class="margin-right">
-                        <template v-for="(item,index) in searchData.timeSpan">
+                        <template v-for="(item,index) in searchManager.data.timeSpan">
                             <label >时间段:
                                 <input type="time" v-model="item.start" />
                                 -
                                 <input  type="time" v-model="item.end" :min="item.start"/>
                             </label>
-                            <span v-if="index>=1" class="deleteButton" @click="sliceTimeSpan(index)">
+                            <span v-if="index>=1" class="deleteButton" @click="searchManager.removeTimeSpan(index)">
                                 X
                             </span>
                         </template>
                     </div>
-                    <sbutton @mdEvent="searchData.addItem()">+</sbutton>
+                    <sbutton @mdEvent="searchManager.addTimeSpan()">+</sbutton>
                 </div>
                 <div class="inputContainer1">
-                    <label>周一<input name="week" type="checkbox" value="1" v-model="searchData.week.mon"/></label>
-                    <label>周二<input name="week" type="checkbox" value="2" v-model="searchData.week.tue"/></label>
-                    <label>周三<input name="week" type="checkbox" value="3" v-model="searchData.week.wed"/></label>
-                    <label>周四<input name="week" type="checkbox" value="4" v-model="searchData.week.thur"/></label>
-                    <label>周五<input name="week" type="checkbox" value="5" v-model="searchData.week.fri"/></label>
-                    <label>周六<input name="week" type="checkbox" value="6" v-model="searchData.week.sat"/></label>
-                    <label>周日<input name="week" type="checkbox" value="7" v-model="searchData.week.sun"/></label>
+                    <label>周一<input name="week" type="checkbox" value="1" v-model="searchManager.data.week.mon"/></label>
+                    <label>周二<input name="week" type="checkbox" value="2" v-model="searchManager.data.week.tue"/></label>
+                    <label>周三<input name="week" type="checkbox" value="3" v-model="searchManager.data.week.wed"/></label>
+                    <label>周四<input name="week" type="checkbox" value="4" v-model="searchManager.data.week.thur"/></label>
+                    <label>周五<input name="week" type="checkbox" value="5" v-model="searchManager.data.week.fri"/></label>
+                    <label>周六<input name="week" type="checkbox" value="6" v-model="searchManager.data.week.sat"/></label>
+                    <label>周日<input name="week" type="checkbox" value="7" v-model="searchManager.data.week.sun"/></label>
                 </div>
                 <!-- <button @click="reverseForm()">重置</button> -->
-                <sbutton @mdEvent="onSearchClick()">搜索</sbutton>
+                <sbutton @mdEvent="searchManager.postForm()">搜索</sbutton>
                 <template v-if="userLevel==2">
                     <sbutton @mdEvent="setFlowBoxWindowState('addSoftWareBox','show')" class="vertical-center">
                         添加
                     </sbutton>
                 </template>
-                <input type="reset" @click="searchData.reverse()">
+                <input type="reset" @click="searchManager.reverseData()">
             </form>
             <div class="bg">
             </div>
@@ -302,6 +302,7 @@ export default{
     },
     data(){
         return {
+			//申请窗口对象
 			applyManager:{
 				//applybox的窗口状态
 				containerWindowState:"hide",
@@ -365,10 +366,10 @@ export default{
 					        reqData.data.forEach(item=>{
 					            thisP.data.useStateList.push({
 									name:item.UserName,
-									startDate:item.StartDate,
-									endData:item.EndDate,
-									startTime:item.StartTime,
-									endTime:item.EndTime,
+									startDate:item.StartDate.substr(0,10),
+									endData:item.EndDate.substr(0,10),
+									startTime:item.StartTime.substr(11,5),
+									endTime:item.EndTime.substr(11,5),
 									week:[item.Monday,item.Tuesday,item.Wednesday,item.Thursday,item.Friday,item.Saturday,item.Sunday]
 								});
 					        });
@@ -406,7 +407,6 @@ export default{
 						return;
 					}
 					
-					console.log(this.applyWindowState);
 					this.applyWindowState=value;
 				},
 				/**
@@ -487,17 +487,123 @@ export default{
 					});
 				}
 			},
-			//日历的容器
-			applyBoxState:"hide",
-            searchBoxState:"hide",
+			//搜索框对象
+			searchManager:{
+				//当前窗口的状态
+				windowState:"hide",
+				//每次发生改变都会重置data的值
+				clearSign:true,
+				//当前是否有光标在搜索框上
+				isFocus:false,
+				isScrollWatch:true,
+				data:{
+					softwareName:"",
+					room:"",
+					build:"",
+					peopleCpa:0,
+					startDate:"",
+					endDate:"",
+					timeSpan:[{start:"",end:""}],
+					week:{mon:false,tue:false,wed:false,thur:false,fri:false,sat:false,sun:false},
+				},
+				/**
+				 * 重置数据
+				 */
+				reverseData(){
+					var now=new Date();
+					this.data.week.mon=this.data.week.tue=this.data.week.wed=this.data.week.thur=this.data.week.fri=this.data.week.sat=this.data.week.sun=false;
+					this.data.timeSpan.splice(1);
+					this.data.timeSpan[0].start="00:00"
+					this.data.timeSpan[0].end="23:59";
+					this.data.startDate=now.format("yyyy-MM-dd");
+					this.data.endDate="2050-11-12";
+					this.clearSign=!this.clearSign;
+					
+				},
+				/**
+				 * 搜索指定的内容
+				 */
+				postForm(){
+					if(_this.myTools.compareDate(this.data.startDate,this.data.endDate)>0){
+						_this.$store.commit('addPromtMessage',"开始时间不能大于结束时间");
+						return;
+					}
+					
+					for(var i=0;i<this.data.timeSpan.length;i++){
+						if(_this.myTools.compareTime(this.data.timeSpan[i].start,this.data.timeSpan[i].end)>0){
+							_this.$store.commit('addPromtMessage',`第${i+1}个时间段,开始时间不能大于结束时间`);
+							return;
+						}
+					}
+					
+					_this.$store.commit("getData",{opreate:"search",ts:JSON.stringify(this.data)});
+				},
+				/**
+				 * 添加一个时间段
+				 */
+				addTimeSpan(){
+					this.data.timeSpan.push({start:"",end:""});
+				},
+				/**
+				 * 移除一个时间段
+				 * @param {Object} index
+				 */
+				removeTimeSpan(index){
+					this.data.timeSpan.splice(index,1);
+				},
+				/**
+				 * 设置搜索窗口当前的状态
+				 * @param {Object} value
+				 */
+				setWindowState(value){
+					if(!value||!(value==="show"||value==="hide")){
+						alert("设置格式不正确");
+						return;
+					}
+					
+					this.windowState=value;
+				},
+				/**
+				 * 设置data的内容
+				 * @param {Object} e 事件对象带值
+				 * @param {Object} target 修改的目标
+				 */
+				setData(e,target){
+					switch(target){
+					    case 'softwareName':
+					    this.data.softwareName=e.value;
+					    break;
+					    case 'room':
+					    this.data.room=e.value;
+					    break;
+					    case 'build':
+					    this.data.build=e.value;
+					    break;
+					    case 'peopleCpa':
+					    this.data.peopleCpa=e.value;
+					    break;
+					}
+					
+				},
+				setFocus(value){
+					if("boolean"!==typeof(value)){
+						console.log(格式不正确);
+						return;
+					}
+					
+					this.isFocus=value;
+					if(!this.isFocus){
+						this.isScrollWatch=false;
+						setTimeout(()=>{
+						    this.isScrollWatch=true;
+						}, 1000);
+						
+					}
+					
+				}
+			},
 			softWareBoxState:"hide",
 			modifyBoxState:"hide",
-            /*当前的焦点是否在搜索框上*/
-            isFocusOnBoX:false,
-            /*离开输入框一秒后开启滑动监听，用来关闭搜索框*/
-            openScrollWatch:true,
-            /*---是否显示添加软件的窗口"show" 或者 "hide"*/
-            
             /*----新增软件的数据绑定------*/
             tData:{
                 room:"",
@@ -526,42 +632,8 @@ export default{
                 savesystem:false,
                 softwares:[],//原始的软件列表
             },
-            /*搜索框数据绑定*/
-            searchData:{
-                softwareName:"",
-                room:"",
-                build:"",
-                peopleCpa:0,
-                startDate:"",
-                endDate:"",
-                timeSpan:[{start:"",end:""}],
-                week:{mon:false,tue:false,wed:false,thur:false,fri:false,sat:false,sun:false},
-                //清空数组的信号 值发生改变时会清空数组
-                clearSign:true,
-                reverse(){
-                    let now=new Date();
-                    let year=now.getFullYear();
-                    let month=now.getMonth();
-                    if(month<10){
-                        month="0"+month;
-                    }
-                    let day=now.getDate();
-                    if(day<10){
-                        day="0"+day;
-                    }
-                    this.week.mon=this.week.tue=this.week.wed=this.week.thur=this.week.fri=this.week.sat=this.week.sun=false;
-                    this.timeSpan.splice(1);
-                    this.startDate=year+"-"+month+"-"+day;
-                    this.endDate=year+"-"+month+"-"+day;
-                    this.clearSign=!this.clearSign;
-                },
-                addItem(){
-                    this.timeSpan.push({start:"",end:""});
-                },
-            },
             /*当前的显示目标*/
             target:-1,
-			
         }
     },
     computed:{
@@ -573,7 +645,8 @@ export default{
             }else{
                 result=this.targetSearchDatas[this.target];
             }
-            this.searchBoxState="hide";
+			
+            this.searchManager.setWindowState("hide");
             return result;
         },
         userLevel(){
@@ -581,10 +654,10 @@ export default{
         },
         targetSearchDatas(){
             let sd=this.$store.state.targetSearchDatas;
-            //console.log(sd.length);
             if(sd.length>0){
                 this.switchToTarget(sd.length-1);
             }
+			
             return sd;
         },
     },
@@ -672,49 +745,6 @@ export default{
 		},
         switchToTarget(target){
             this.target=target;
-        },
-        sliceTimeSpan(index){
-            this.searchData.timeSpan.splice(index,1);
-        },
-        oninputValueChange(e,bind){
-            switch(bind){
-                case 'softwareName':
-                this.searchData.softwareName=e.value;
-                break;
-                case 'room':
-                this.searchData.room=e.value;
-                break;
-                case 'build':
-                this.searchData.build=e.value;
-                break;
-                case 'peopleCpa':
-                this.searchData.peopleCpa=e.value;
-                break;
-            }
-        },
-        onSearchClick(){
-            ///*验证数据输入的合法性*/////
-            this.$store.commit("getData",{opreate:"search",ts:JSON.stringify(this.searchData)});
-        },
-        //点击显示搜索盒子
-        flowSearchBoxClick(){
-            let _this = this
-            if(this.searchBoxState=="hide"){
-                this.searchBoxState="show";
-            }
-        },
-        //当焦点聚焦于搜索盒子上
-        focusOnSearchBox(){
-            this.isFocusOnBoX=true;
-        },
-        //失去搜索盒子焦点，开启滚动监听
-        blurOnSearchBox(){
-            let _this=this;
-            _this.openScrollWatch=false;
-            _this.isFocusOnBoX=false;
-            setTimeout(()=>{
-                _this.openScrollWatch=true;
-            }, 1000);
         },
         //处理结果的页数
         resultItemPageNext(obj){
@@ -931,12 +961,6 @@ export default{
 				return;
 			}
 			
-			//申请教室的窗口
-			if(target==="applyBox"){
-				this.applyBoxState=value;
-				return;
-			}
-			
         },
         toggleRoomTitle(data){
             if(data.title==data.build)
@@ -949,14 +973,15 @@ export default{
     },
     mounted(){
         _this=this;
-        _this.searchData.reverse();
+        this.searchManager.reverseData();
         /*滑动监听*/
         resultContainer=$(".resultContainer")[0];
         resultContainer.onscroll=()=>{
             //隐藏搜索框
-            if(_this.searchBoxState=="show"&&!_this.isFocusOnBoX&&_this.openScrollWatch){
-                _this.searchBoxState="hide";
+            if(_this.searchManager.windowState==="show"&&!_this.searchManager.isFocus&&_this.searchManager.isScrollWatch){
+              _this.searchManager.setWindowState("hide")
             }
+			
             if(_this.target==-1){
                 let scrollBottom=resultContainer.scrollHeight-resultContainer.scrollTop-resultContainer.clientHeight;
                 if(scrollBottom<10){
@@ -966,6 +991,7 @@ export default{
                     }
                 }
             }
+			
         };
 		
         //用于第一次加载页面的时候获取数据
