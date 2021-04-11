@@ -238,6 +238,7 @@ input[type="reset"]{
 	right: -10px;
 	top: -25px;
 	color: #fd6f6f;
+	cursor: pointer;
 }
 //*100%宽度的盒子*/
 .widthBox{

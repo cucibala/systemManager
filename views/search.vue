@@ -38,7 +38,7 @@
                         </div>
                         <!-- 存在于房间信息底部的区域 -->
                         <div>
-                            <sbutton @mdEvent="onApplyRoom(data.room,data.build)">申请</sbutton>
+                            <sbutton @mdEvent="applyManager.initData(data.build,data.room)">申请</sbutton>
                             <template v-if="userLevel==2">
                                 <sbutton @mdEvent="modifyRoom(data)" class="vertical-center">
                                     修改
@@ -179,30 +179,46 @@
             <div class="bgcolor" style="background-color:rgb(251 255 222);opacity: 0.95;"></div>
             <div class="exit-button" @click="setFlowBoxWindowState('addSoftWareBox','hide')">X</div>
         </div>
-        <div id="applyBox" class="operateBox" :state="applyBoxState" >
-            <span class="title" @click="toggleRoomTitle(applyData)" v-if="applyData.title==applyData.room" active>
-                {{applyData.room}}123
+        <div id="applyBox" class="operateBox" :state="applyManager.containerWindowState" >
+            <span class="title" @click="toggleRoomTitle(applyManager.data)" v-if="applyManager.data.title==applyManager.data.room" active>
+                {{applyManager.data.room}}
             </span>
-            <span class="title" @click="toggleRoomTitle(applyData)" v-else disactive>
-                {{applyData.build}}123
+            <span class="title" @click="toggleRoomTitle(applyManager.data)" v-else disactive>
+                {{applyManager.data.build}}
             </span>
             <br>
             <div id="fullcalendarContainer">
-                <calendar :dataBase="applyData.useStateList"></calendar>
+                <calendar :dataBase="applyManager.data.useStateList" :calendarMiddleAbsoluteWindowState="applyManager.applyWindowState=='show'">
+					<template v-slot:calendarFoot><sbutton @mdEvent="applyManager.setApplyRoomWindow('show')">使用申请</sbutton></template>
+					<template v-slot:calendarMiddleAbsoluteWindow>
+						<div v-if="applyManager.applyWindowState=='show'" id="applyRoomWindow">
+							<div>
+								<div><label>开始日期: </label><input type="date" v-model="applyManager.applyForm.startDate"/></div>
+								<div><label>结束日期: </label><input type="date" v-model="applyManager.applyForm.endDate"/></div>
+								<div><label>时间段: </label><input type="time" v-model="applyManager.applyForm.startTime"/> -> <input type="time" v-model="applyManager.applyForm.endTime"/></div>
+								<div>
+								    <span>周一<input name="week" type="checkbox" value="1" v-model="applyManager.applyForm.week.mon"/></span>
+								    <span>周二<input name="week" type="checkbox" value="2" v-model="applyManager.applyForm.week.tue"/></span>
+								    <span>周三<input name="week" type="checkbox" value="3" v-model="applyManager.applyForm.week.wed"/></span>
+								    <span>周四<input name="week" type="checkbox" value="4" v-model="applyManager.applyForm.week.thur"/></span>
+								    <span>周五<input name="week" type="checkbox" value="5" v-model="applyManager.applyForm.week.fri"/></span>
+								    <span>周六<input name="week" type="checkbox" value="6" v-model="applyManager.applyForm.week.sat"/></span>
+								    <span>周日<input name="week" type="checkbox" value="7" v-model="applyManager.applyForm.week.sun"/></span>
+								</div>
+								<div>申请理由:</div>
+								<textarea v-model="applyManager.applyForm.reason"></textarea>
+							</div>
+							<div>
+								<sbutton @mdEvent="applyManager.postForm()">提交</sbutton>
+								<sbutton @mdEvent="applyManager.setApplyRoomWindow('hide')">取消</sbutton>
+								<sbutton @mdEvent="applyManager.resetApplyForm()">重置</sbutton>
+							</div>
+						</div>
+					</template>
+				</calendar>
             </div>
-            <!-- <span>{{applyData.room}}</span>
-            <span>{{applyData.build}}</span> -->
-            <!-- <div class="applyDetailContainer">
-            <span>2021.3.6-2021.5.2</span>
-            <span> 11:40-12:40</span>
-            <span> 11:40-12:40</span>
-            <span>周一</span>
-            <span>周二</span>
-            <span>周四</span></div> -->
-            <!-- <template v-for="useState in applyData.useStateList">
-            {{useState.StartTime}}</template> -->
             <div class="bgcolor" style="background-color:rgb(255 255 255);opacity: 0.95;"></div>
-            <div class="exit-button" @click="setFlowBoxWindowState('applyBox','hide')">X</div>
+            <div class="exit-button" @click="applyManager.setApplyContainer('hide')">X</div>
         </div>
         <div class="flowSearchBox" :state="searchBoxState" @click="flowSearchBoxClick()">
             <form method="post">
@@ -268,8 +284,6 @@ import sbutton from "../vue-component/sbutton.vue";
 import exitButton from "../vue-component/exitButton.vue";
 import webconfig from "../web.config.js";
 import calendar from "../vue-component/calendar.vue";
-//
-// import '@fortawesome/fontawesome-free/css/all.css';
 import md5 from "md5";
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -288,16 +302,202 @@ export default{
     },
     data(){
         return {
-            /*当前搜索框的状态*/
+			applyManager:{
+				//applybox的窗口状态
+				containerWindowState:"hide",
+				//申请房间窗口当前的状态
+				applyWindowState:"hide",
+				//从服务器端获取到的房间数据
+				data:{
+					room:"",
+					build:"",
+					title:"",
+					useStateList:[{
+					    name:"张三封",
+					    startDate:"2021-01-05",
+					    endData:"2021-02-06",
+						startTime:"15:36",
+						endTime:"17:38",
+					    week:[true,false,false,true,false,true,true]
+					}],
+				},
+				//要进行上传的表单数据
+				applyForm:{
+					room:"",
+					build:"",
+					startDate:"2021-04-10",
+					endDate:"2021-04-11",
+					startTime:"15:16",
+					endTime:"15:18",
+					week:{mon:false,tue:false,wed:false,thur:false,fri:false,sat:false,sun:false},
+					reason:"",
+				},
+				/**
+				 * 初始化data的数据
+				 * @param {Object} build 教学楼的名字
+				 * @param {Object} room 房间的名字
+				 */
+				initData(build,room){
+					let formData=new FormData();
+					let skeys=$.cookie('skeys');
+					let account=$.cookie('account');
+					let opreate="applySearch";
+					let md5value=md5(account+room+build+opreate+skeys);
+					var thisP=this;
+					_this.axios({
+					    method: 'get',
+					    url: webconfig.address()+"api/Search",
+					    params:{
+					        "account":account,
+					        build,
+					        room,
+					        md5value,
+					        opreate
+					    }
+					}).then(res=>{
+						var reqData=res.data;
+					    if(reqData.code==="200"){
+							console.log(reqData)
+					        thisP.data.room=room;
+					        thisP.data.title=room;
+					        thisP.data.build=build;
+					        thisP.data.useStateList.splice(0);
+					        reqData.data.forEach(item=>{
+					            thisP.data.useStateList.push({
+									name:item.UserName,
+									startDate:item.StartDate,
+									endData:item.EndDate,
+									startTime:item.StartTime,
+									endTime:item.EndTime,
+									week:[item.Monday,item.Tuesday,item.Wednesday,item.Thursday,item.Friday,item.Saturday,item.Sunday]
+								});
+					        });
+							
+					        thisP.setApplyContainer("show");
+							
+					    }else{
+					        _this.$store.commit("addPromtMessage","获取信息发生异常 : "+res.data.msg);
+					    }
+						
+					}).catch(ex=>{
+						console.log(ex);
+					    _this.$store.commit("addPromtMessage","获取信息发生异常 : "+ex.message);
+					});
+					
+				},
+				/**
+				 * 设置申请窗口容器的状态
+				 * @param {Object} value
+				 */
+				setApplyContainer(value){
+					if(!value||!(value==="show"||value==="hide")){
+						alert("设置格式不正确");
+						return;
+					}
+					
+					this.containerWindowState=value;
+				},
+				/**
+				 * 打开申请房间的窗口
+				 * */
+				setApplyRoomWindow(value){
+					if(!value||!(value==="show"||value==="hide")){
+						alert("设置格式不正确");
+						return;
+					}
+					
+					console.log(this.applyWindowState);
+					this.applyWindowState=value;
+				},
+				/**
+				 * 重置表单数据
+				 */
+				resetApplyForm(){
+					var today=new Date();
+					this.applyForm.startDate=today.format("yyyy-MM-dd");
+					this.applyForm.endDate=today.format("yyyy-MM-dd");
+					this.applyForm.startTime="08:00";
+					this.applyForm.endTime="17:18";
+					this.applyForm.reason="";
+					this.applyForm.week.mon=this.applyForm.week.tue=this.applyForm.week.wed=this.applyForm.week.thur=this.applyForm.week.fri=this.applyForm.week.sat=this.applyForm.week.sun=false;
+				},
+				/**
+				 * 上传表单数据到服务器
+				 * */
+				postForm(){
+					if(this.applyForm.startDate.length===0||this.applyForm.endDate.length===0||this.applyForm.startTime.length===0||this.applyForm.endTime.length===0){
+						_this.$store.commit('addPromtMessage',"时间输入不能为空");
+						return;
+					}
+					
+					if(_this.myTools.compareDate(this.applyForm.startDate,this.applyForm.endDate)>0){
+						_this.$store.commit('addPromtMessage',"开始时间不能大于结束时间");
+						return;
+					}
+					
+					if(_this.myTools.compareTime(this.applyForm.startTime,this.applyForm.endTime)>0){
+						_this.$store.commit('addPromtMessage',"开始时间不能大于结束时间");
+						return;
+					}
+					
+					if(!this.applyForm.week.mon&&!this.applyForm.week.tue&&!this.applyForm.week.wed&&!this.applyForm.week.thur&&!this.applyForm.week.fri&&!this.applyForm.week.sat&&!this.applyForm.week.sun){
+						_this.$store.commit('addPromtMessage',"请至少选择一天");
+						return;
+					}
+					
+					this.applyForm.room=this.data.room;
+					this.applyForm.build=this.data.build;
+					let skeys=$.cookie('skeys');
+					let account=$.cookie('account');
+					if(!skeys||!account){
+						_this.$store.commit('addPromtMessage',"登陆过期请重新登陆");
+						$.cookie('isLogin',false);
+						_this.$router.push('/login');
+						return;
+					}
+					
+					var applyFromData=JSON.stringify(this.applyForm)
+					var formData=new FormData();
+					var md5Value=md5(account+applyFromData+skeys);
+					formData.append("account",account);
+					formData.append("md5value",md5Value);
+					formData.append("opreate","apply");
+					formData.append("data",applyFromData);
+					var thisP=this;
+					_this.axios({
+					    method: 'post',
+					    url: webconfig.address()+"api/Search",
+					    data: formData,
+					    transformRequest: [
+					        function(){
+					            return formData;
+					        }
+					    ],
+					    headers: {"Content-Type": "multipart/form-data"}
+					}).then((response) => {
+						var data=response.data;
+						if(data.code==="200"){
+							thisP.resetApplyForm();
+							thisP.setApplyRoomWindow('hide');
+							_this.$store.commit('addPromtMessage',"申请成功，请等待管理员审核，可去”我的“查看申请进度");
+						}else{
+							_this.$store.commit('addPromtMessage',data.msg);
+						}
+						
+					});
+				}
+			},
+			//日历的容器
+			applyBoxState:"hide",
             searchBoxState:"hide",
+			softWareBoxState:"hide",
+			modifyBoxState:"hide",
             /*当前的焦点是否在搜索框上*/
             isFocusOnBoX:false,
             /*离开输入框一秒后开启滑动监听，用来关闭搜索框*/
             openScrollWatch:true,
             /*---是否显示添加软件的窗口"show" 或者 "hide"*/
-            softWareBoxState:"hide",
-            modifyBoxState:"hide",
-            applyBoxState:"show",
+            
             /*----新增软件的数据绑定------*/
             tData:{
                 room:"",
@@ -359,39 +559,9 @@ export default{
                     this.timeSpan.push({start:"",end:""});
                 },
             },
-            applyData:{
-                room:"",
-                build:"",
-                title:"",
-                useStateList:[{
-                    name:"张三",
-                    year:2021,
-                    startMonth:1,
-                    endMonth:3,
-                    week:[true,false,false,true,false,true,true]
-                },
-                {
-                    name:"张牛",
-                    year:2021,
-                    startMonth:1,
-                    endMonth:3,
-                    week:[true,false,false,true,false,true,true]
-                },{
-                    name:"李四",
-                    year:2021,
-                    startMonth:2,
-                    endMonth:6,
-                    week:[true,true,true,false,false,true,false]
-                },{
-                    name:"王五",
-                    year:2021,
-                    startMonth:9,
-                    endMonth:10,
-                    week:[true,true,false,false,false,true,true]
-                }],
-            },
             /*当前的显示目标*/
             target:-1,
+			
         }
     },
     computed:{
@@ -419,39 +589,49 @@ export default{
         },
     },
     methods:{
-        onApplyRoom(room,build){
-            let formData=new FormData();
-            let skeys=$.cookie('skeys');
-            let account=$.cookie('account');
-            let opreate="applySearch";
-            let md5value=md5(account+room+build+opreate+skeys);
-            _this.axios({
-                method: 'get',
-                url: webconfig.address()+"api/Search",
-                params:{
-                    "account":account,
-                    build,
-                    room,
-                    md5value,
-                    opreate
-                }
-            }).then(res=>{
-                console.log(res);
-                if(res.data.code==="200"){
-                    _this.applyData.room=room;
-                    _this.applyData.title=room;
-                    _this.applyData.build=build;
-                    _this.applyData.useStateList.splice(0);
-                    res.data.data.forEach(item=>{
-                        _this.applyData.useStateList.push(item);
-                    });
-                    _this.applyBoxState="show";
-                }else{
-                    _this.$store.commit("addPromtMessage","获取信息发生异常 : "+res.data.msg);
-                }
-            }).catch(ex=>{
-                _this.$store.commit("addPromtMessage","获取信息发生异常 : "+ex.message);
+        /**
+		* 添加一个软件
+		* @param {String} target 当前修改的类型 newSoftware modifySoftware
+		*/
+        addSoftwareMsg(target){
+            //modifyData
+            let _this=this;
+            let data;
+            switch(target){
+                case "newSoftware":
+                data=this.tData;
+                break;
+                case "modifySoftware":
+                data=this.modifyData;
+                break;
+            }
+            ///-----------------判断能否添加
+            if(data.tname.length===0||data.tsystem.length==0){
+                this.$store.commit('addPromtMessage',"软件名称或系统输入不能为空");
+                return;
+            }
+            try{//判断是否存在相同的软件名称
+                data.softwares.forEach(item=>{
+                    if(data.tname==item.name&&data.tsystem==item.system){
+                        throw new Error("无法添加相同项");
+                    }
+                });
+            }catch(e){
+                this.$store.commit('addPromtMessage',e.message);
+                return;
+            }
+            ///---------------结束验证-----------------------
+            ///---------------进行插入操作
+            data.softwares.push({
+                name:data.tname,
+                system:data.tsystem,
+                id:data.softwares.length+1,
+                state:"nromal",
             });
+            if(!data.savename)
+            data.tname="";
+            if(!data.savesystem)
+            data.tsystem="";
         },
         computedSwicth(index){
             if(index==this.target){
@@ -460,6 +640,36 @@ export default{
                 return "";
             }
         },
+		//添加元素的时候，从元素列表中删除元素
+		delteFromtsoftwares(value){
+		    let data;
+		    switch(value.target){
+		        case "newSoftware":
+		        data=this.tData;
+		        break;
+		        case "modifySoftware":
+		        data=this.modifyData;
+		        break;
+		    }
+			
+		    let removeItemIndex;
+		    try{
+		        data.softwares.forEach((item,index,arr)=>{
+		            if(item.id == value.id){
+						item.state="hide";
+		                removeItemIndex=index;
+		                throw new Error("找到元素");
+		            }
+					
+		        });
+		    }catch(e){
+		        console.log("删除");
+		    }
+			
+		    setTimeout(()=>{
+		        data.softwares.splice(removeItemIndex,1);
+		    },500);
+		},
         switchToTarget(target){
             this.target=target;
         },
@@ -522,75 +732,6 @@ export default{
             }else{
                 this.$store.commit('addPromtMessage',"这里是开始的地方！！！");
             }
-        },
-        //添加元素的时候，从元素列表中删除元素
-        delteFromtsoftwares(value){
-            let data;
-            switch(value.target){
-                case "newSoftware":
-                data=this.tData;
-                break;
-                case "modifySoftware":
-                data=this.modifyData;
-                break;
-            }
-            let removeItem;
-            try{
-                data.softwares.forEach((item,index,arr)=>{
-                    if(item.id == value.id){
-                        removeItem=item;
-                        throw new Error("找到元素");
-                    }
-                });
-            }catch(e){
-                console.log("删除");
-            }
-            removeItem.state="hide";
-            setTimeout(()=>{
-                //removeItem.state="delete";
-                data.softwares.splice(data.softwares.indexOf(removeItem),1);
-            },500);
-        },
-        //添加一个软件的信息
-        addSoftwareMsg(target){
-            //modifyData
-            let _this=this;
-            let data;
-            switch(target){
-                case "newSoftware":
-                data=this.tData;
-                break;
-                case "modifySoftware":
-                data=this.modifyData;
-                break;
-            }
-            ///-----------------判断能否添加
-            if(data.tname.length===0||data.tsystem.length==0){
-                this.$store.commit('addPromtMessage',"软件名称或系统输入不能为空");
-                return;
-            }
-            try{//判断是否存在相同的软件名称
-                data.softwares.forEach(item=>{
-                    if(data.tname==item.name&&data.tsystem==item.system){
-                        throw new Error("无法添加相同项");
-                    }
-                });
-            }catch(e){
-                this.$store.commit('addPromtMessage',e.message);
-                return;
-            }
-            ///---------------结束验证-----------------------
-            ///---------------进行插入操作
-            data.softwares.push({
-                name:data.tname,
-                system:data.tsystem,
-                id:data.softwares.length+1,
-                state:"nromal",
-            });
-            if(!data.savename)
-            data.tname="";
-            if(!data.savesystem)
-            data.tsystem="";
         },
         //重置添加窗口
         resetSoftwareMsgWindow(promt){
@@ -757,18 +898,45 @@ export default{
             });
             this.modifyBoxState="show";
         },
+		/**
+		 * 设置浮动窗口的状态
+		 * @param [modifyBox,addSoftWareBox,applyBox] target 目标窗口
+		 * @param ["show","hide"] value 目标窗口的状态
+		 */
         setFlowBoxWindowState(target,value){
-            switch(target){
-                case "modifyBox":
-                this.modifyBoxState=value;
-                break;
-                case "addSoftWareBox":
-                this.softWareBoxState=value;
-                break;
-                case "applyBox":
-                this.applyBoxState=value;
-                break;
-            }
+			if(!target||!value){
+				alert("setFlowBoxWindowState:缺少参数");
+				return;
+			}
+			
+			if(!(target==="modifyBox"||target==="addSoftWareBox"||target==="applyBox")){
+				alert("setFlowBoxWindowState:没有当前窗口"+target);
+				return;
+			}
+			
+			if(!(value==="show"||value==="hide")){
+				alert("setFlowBoxWindowState:参数设置不正确"+value);
+				return;
+			}
+			
+			//修改页面的窗口
+			if(target==="modifyBox"){
+				this.modifyBoxState=value;
+				return;
+			}
+			
+			//添加软件页面的窗口
+			if(target==="addSoftWareBox"){
+				this.softWareBoxState=value;
+				return;
+			}
+			
+			//申请教室的窗口
+			if(target==="applyBox"){
+				this.applyBoxState=value;
+				return;
+			}
+			
         },
         toggleRoomTitle(data){
             if(data.title==data.build)
@@ -776,49 +944,12 @@ export default{
             else
             data.title=data.build;
         },
+		
+		
     },
     mounted(){
         _this=this;
         _this.searchData.reverse();
-
-        /*设置日历*/
-        // let calendarEl =document.getElementById("fullcalendarContainer");
-        // let calendar = new Calendar(calendarEl, {
-        // 	plugins: [ dayGridPlugin, timeGridPlugin, listPlugin,momentPlugin],
-        // 	initialView: 'dayGridMonth',
-        // 	headerToolbar: {
-        // 		left: 'prev,today',
-        // 		center: 'title',
-        // 		right:'next'
-        // 		// right: 'dayGridMonth,timeGridWeek,listWeek'
-        // 	},
-        // 	views: {
-        // 		dayGridMonth: {
-        // 			titleFormat:"YYYY - MM"
-        // 		}
-        // 	},
-        // 	windowResize: function(arg) {
-        // 		calendar.setOption('height', $("#applyBox").height()-150);
-        // 		calendar.setOption('aspectRatio',  ($("#applyBox").height()-150)/ ($("#applyBox").width()-20));
-        // 		this.updateSize();
-        // 		calendar.render();
-        // 		//alert('The calendar has adjusted to a window resize. Current view: ' + arg.view.type);
-        // 	}
-        // });
-        // calendar.setOption('height', $("#applyBox").height()-150);
-        // calendar.setOption('aspectRatio',  ($("#applyBox").height()-150)/ ($("#applyBox").width()-20));
-        // calendar.render();
-        // calendar.addResource({
-        // 	id: 'e',
-        // 	title: 'Room E'
-        // });
-        // calendar.changeView('timeGrid', {
-        // 	start: '2020-7-01',
-        // 	end:  '2020-9-01',
-        // });
-        /********/
-
-
         /*滑动监听*/
         resultContainer=$(".resultContainer")[0];
         resultContainer.onscroll=()=>{
@@ -836,17 +967,17 @@ export default{
                 }
             }
         };
-        /*滑动监听*/
-
-        /*用于第一次加载页面的时候获取数据*/
+		
+        //用于第一次加载页面的时候获取数据
         if(_this.searchPageDatas.currentPage==0&&_this.searchPageDatas.version==0){
             _this.$store.commit("getData",{opreate:"init"});
         }
-        /******************/
+		
     },
     beforeRouteLeave(to, from, next){
         resultContainer.onscroll=null;
         next();
+		
     }
 }
 </script>
@@ -865,6 +996,8 @@ export default{
 @resultContainerMarginTop:5px;
 @resultContainerHeight:100% - @resultContainerPadding*2 - @headerContainerHeight - @resultContainerMarginTop;
 @resultContainer_innerContainerPaddingLeft:15px;
+//申请教室的下面那个容器的高度  
+@applyRoomWindowFootHeight:40px;
 @keyframes rotateSingleRound
 {
     from {transform:rotateX(0deg)}
@@ -1227,5 +1360,49 @@ export default{
         height:calc(100% - 35px);
         display: block;
     }
+}
+#applyRoomWindow{
+	width:calc(100% - 8px);
+	height:calc(100% - 8px);
+	background-color: #008d57;
+	padding: 4px;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	color: white;
+	>div:nth-child(1){
+		height: calc(100% - @applyRoomWindowFootHeight);
+		width: 100%;
+		display: inherit;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		>div{
+			text-align: left;
+			width: 100%;
+			height:30px;
+			margin:4px 0px;
+			overflow: auto;
+			label{
+				width: 100px;
+				display: inline-block;
+				text-align: right;
+				margin-right: 20px;
+			}
+		}
+		textarea{
+			width: calc(100% - 8px);
+			height: calc(100% - 30px * 5 - 25px);
+			resize:none;
+			display: inline-block;
+		}
+	}
+	
+	>div:nth-child(2){
+		height: @applyRoomWindowFootHeight;
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content :  space-around;
+	}
 }
 </style>

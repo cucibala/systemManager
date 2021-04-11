@@ -483,7 +483,11 @@
             </div>
         </div>
         <div class="calendarFoot">
+			<slot name="calendarFoot"></slot>
         </div>
+		<div class="calendarMiddleAbsoluteWindow" v-if="calendarMiddleAbsoluteWindowState">
+			<slot name="calendarMiddleAbsoluteWindow"></slot>
+		</div>
     </div>
 </template>
 <script>
@@ -492,6 +496,7 @@ import $ from "jquery";
 export default{
     props:{
         dataBase:{type:Array},
+		calendarMiddleAbsoluteWindowState:{type:Boolean,default:false}
     },
     data(){
         return {
@@ -504,7 +509,7 @@ export default{
             startDay:0,
             week:0,
             day:0,
-            //日期列表
+            //日期列表 1-31
             dateCellList:[],
             //日期类型:值类型[lastMonth,currentMonth,nextMonth]
             dateCellMonthType:[],
@@ -535,47 +540,176 @@ export default{
                 item.occupy.splice(0);
                 item.remain=0;
             });
-
+			
             //2.对数组进行赋值
-            this.currentDataBase.forEach(item1=>{
-                //判断是否是当前的年份
-                if(item1.year == this.currentYear){
-                    var lastMonthAble=false;
-                    var currentMonthAble=false;
-                    var nextMonthAble=false;
-                    if(item1.startMonth<=this.currentMonth-1&&item1.endMonth>=this.currentMonth){
-                        lastMonthAble=true;
-                    }
-
-                    if(item1.startMonth<=this.currentMonth&&item1.endMonth>=this.currentMonth){
-                        currentMonthAble=true;
-                    }
-
-                    if(item1.startMonth<=this.currentMonth&&item1.endMonth>=this.currentMonth+1){
-                        nextMonthAble=true;
-                    }
-
-                    this.dateCellMonthType.forEach((item2, i) => {
-                        if(item1.week[this.dateCellWeekType[i]]){
-                            if(item2==="lastMonth"){
-                                if(lastMonthAble){
-                                    this.dateCellWeekDay[i].occupy.push({name:item1.name,bindColor:`background-color:${item1.bindColor}`,timeSpan:[{s:"1:00",e:"2:00"}]});
-                                }
-                            }else if(item2==="currentMonth"){
-                                if(currentMonthAble){
-                                    this.dateCellWeekDay[i].occupy.push({name:item1.name,bindColor:`background-color:${item1.bindColor}`,timeSpan:[{s:"1:00",e:"2:00"}]});
-                                }
-                            }else{
-                                if(nextMonthAble){
-                                    this.dateCellWeekDay[i].occupy.push({name:item1.name,bindColor:`background-color:${item1.bindColor}`,timeSpan:[{s:"1:00",e:"2:00"}]});
-                                }
-                            }
-                        }
-
-                    });
-                }
-
-            });
+			var tempData=this.currentDataBase.slice(0);
+			do{
+				if(tempData.length==0){
+					break;
+				}
+				
+				var item=tempData.shift();
+				var startDateSplit=item.startDate.split("-");
+				var endDataSplit=item.endData.split("-"); 
+				var startTimeSplit=item.startTime.split(":");
+				var endTimeSplit=item.startTime.split(":");
+				if(startDateSplit.length!==3||endDataSplit.length!==3||startTimeSplit.length!=2||endTimeSplit.length!=2){
+					console.log("calendar数据格式有误",startDateSplit,endDataSplit,startTimeSplit,endTimeSplit);
+					break;
+				}
+				
+				var startYear=Number(startDateSplit[0]);
+				var startMonth=Number(startDateSplit[1]);
+				var startDay=Number(startDateSplit[2]);
+				var endYear=Number(endDataSplit[0]);
+				var endMonth=Number(endDataSplit[1]);
+				var endDay=Number(endDataSplit[2]);
+				var startHour=Number(startTimeSplit[0]);
+				var startMinute=Number(startTimeSplit[1]);
+				var endtHour=Number(endTimeSplit[0]);
+				var endMinute=Number(endTimeSplit[1]);
+				if(!startYear||!startMonth||!startDay||!endYear||!endMonth||!endDay||!startHour||!startMinute||!endtHour||!endMinute){
+					console.log("calendar数据格式有误,转换为数字失败",startDateSplit,endDataSplit);
+					break;
+				}
+				
+				if(startYear>this.currentYear){
+					continue;
+				}
+				
+				if(endYear<this.currentYear){
+					continue;
+				}
+				
+				var length=this.dateCellList.length;
+				var lastMonthAble=false;
+				var currentMonthAble=false;
+				var nextMonthAble=false;
+				if(startYear<this.currentYear){
+					if(endYear==this.currentYear){
+						if(endMonth>=this.currentMonth-1){
+						    lastMonthAble=true;
+						}
+						
+						if(endMonth>=this.currentMonth){
+						    currentMonthAble=true;
+						}
+						
+						if(endMonth>=this.currentMonth+1){
+						    nextMonthAble=true;
+						}
+						
+					}else{
+						 lastMonthAble=true;
+						 currentMonthAble=true;
+						 nextMonthAble=true;
+					}
+					
+				}
+				
+				if(startYear==this.currentYear){
+					if(endYear==this.currentYear){
+						if(startMonth<=this.currentMonth-1){
+						    lastMonthAble=true;
+						}
+						
+						if(startMonth<=this.currentMonth&&endMonth>=this.currentMonth){
+						    currentMonthAble=true;
+						}
+						
+						if(startMonth<=this.currentMonth+1&&endMonth>=this.currentMonth+1){
+						    nextMonthAble=true;
+						}
+						
+					}else{
+						if(startMonth<=this.currentMonth-1){
+						    lastMonthAble=true;
+						}
+						
+						if(startMonth<=this.currentMonth){
+						    currentMonthAble=true;
+						}
+						
+						if(startMonth<=this.currentMonth+1){
+						    nextMonthAble=true;
+						}
+						 
+					}
+				}
+				
+				for(var i=0;i<length;i++){
+					if(item.week[this.dateCellWeekType[i]]){
+						var isPush=false;
+						do{
+							if(lastMonthAble&&this.dateCellMonthType[i]==="lastMonth"){
+								if(currentMonthAble){
+									isPush=true;
+									break;
+								}
+								
+								if(this.dateCellList[i]>=startDay&&this.dateCellList[i]<=endDay){
+									isPush=true;
+									break;
+								}
+								
+								break;
+							}
+							
+							if(currentMonthAble&&this.dateCellMonthType[i]==="currentMonth"){
+								if(nextMonthAble){
+									isPush=true;
+									break;
+								}
+								
+								if(this.dateCellList[i]<=endDay){
+									if(lastMonthAble){
+										isPush=true;
+										break;
+									}
+									
+									if(this.dateCellList[i]>=startDay){
+										isPush=true;
+										break;
+									}
+									
+								}
+								
+								break;
+							}
+							
+							if(nextMonthAble&&this.dateCellMonthType[i]==="nextMonth"){
+								console.log("check");
+								if(this.dateCellList[i]<=endDay){
+									if(currentMonthAble){
+										isPush=true;
+										break;
+									}
+									
+									if(this.dateCellList[i]>=startDay){
+										isPush=true;
+										break;
+									}
+									
+								}
+								
+								break;
+							}
+							
+						}while(false);
+						
+						if(isPush){
+							this.dateCellWeekDay[i].occupy.push({
+								name:item.name,
+								bindColor:`background-color:${item.bindColor}`,
+								timeSpan:{startTime:{h:startHour,m:startMinute},endTime:{h:endtHour,m:endMinute}},
+							});
+							
+						}
+						
+					}
+				}
+				
+			}while(true);
 
             //3.计算无法显示出来的个数
             this.dateCellWeekDay.forEach((item, i) => {
@@ -597,7 +731,9 @@ export default{
     },
     watch:{
         dataBase(){
+			console.log("value change",this.dataBase);
             this.bindColorWithName();
+			
         }
     },
     methods:{
@@ -635,11 +771,9 @@ export default{
             this.colorList.forEach((item, i) => {
                 item.use=false;
             });
-
-            //复制database
-            this.dataBase.forEach(item=> {
-                this.currentDataBase.push(item);
-            });
+			
+			//复制database
+			this.currentDataBase=this.dataBase.slice(0);
 
             //对当前数据进行颜色绑定
             this.currentDataBase.forEach(item=> {
@@ -658,11 +792,12 @@ export default{
             });
 
         },
-        /*初始化日期数组
-        *@param week 这个月的一号是星期几
-        *@param currentMonthDay 这个月有多少天
-        *@param lastMonthDay  上个月有多少天
-        */
+        /**
+		 * 初始化日期数组
+		 * @param week 这个月的一号是星期几
+		 * @param currentMonthDay 这个月有多少天
+		 * @param lastMonthDay  上个月有多少天
+        **/
         initdateCellList(year,currentMonth){
             this.dateCellMonthType.splice(0);
             let currentDate = new Date(year);
@@ -756,6 +891,7 @@ export default{
 @footHeight:40px;
 @calendarPdding:2px;
 @headDivChild_2Height:30px;
+@calendarMiddleAbsoluteWindow:50%;
 .calendarContainer{
     width: 100%;
     height: 100%;
@@ -1076,5 +1212,12 @@ export default{
     width: 40px;
     height: 40px;
     cursor: pointer;
+}
+.calendarMiddleAbsoluteWindow{
+	top: @calendarMiddleAbsoluteWindow/2;
+	left: 1%;
+	width:98%;
+	height:  @calendarMiddleAbsoluteWindow;
+	position: absolute;
 }
 </style>

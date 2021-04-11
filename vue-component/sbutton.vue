@@ -39,7 +39,6 @@
 	cursor: pointer;
 	user-select:none;
 	transition: all 2s ease 0s;
-	//background-image: linear-gradient(90deg,#eae5c9,#6cc6cb);
 	background-color: #0067b8;
 	position: relative;
 	overflow: hidden;

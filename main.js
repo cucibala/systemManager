@@ -8,11 +8,38 @@ import $ from "jquery";
 import $cookie from "jquery.cookie";
 import webconfig from "./web.config.js";
 import md5 from "md5";
+import myTools from './link/myTools.js'     //引入公用js
+
+Date.prototype.format = function(fmt){
+  var o = {
+    "M+" : this.getMonth()+1,                 //月份
+    "d+" : this.getDate(),                    //日
+    "h+" : this.getHours(),                   //小时
+    "m+" : this.getMinutes(),                 //分
+    "s+" : this.getSeconds(),                 //秒
+    "q+" : Math.floor((this.getMonth()+3)/3), //季度
+    "S"  : this.getMilliseconds()             //毫秒
+  };
+
+  if(/(y+)/.test(fmt)){
+    fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+  }
+        
+  for(var k in o){
+    if(new RegExp("("+ k +")").test(fmt)){
+      fmt = fmt.replace(
+        RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));  
+    }       
+  }
+
+  return fmt;
+}
+Vue.prototype.myTools = myTools;    
 axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
-var test=true;
+var test=false;
 function baseDull(array){
 	array.forEach(item=>{
 		try{
@@ -77,206 +104,10 @@ const store=new Vuex.Store({
 			//一行能容纳的元素个数
 			col:0,
 			//房间列表
-			datas:[
-			{
-				room:"406",
-				build:"阿斯顿线程",
-				state:"able",
-				title:"406",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			],
+			datas:[],
 		},
         //搜索界面发生搜索时的数据保存数组
-		targetSearchDatas:[
-		{
-			bindID:0,
-			datas:[
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			{
-				room:"407",
-				build:"祝线程",
-				state:"able",
-				title:"407",
-				softwares:{
-					total:7,
-					pageSize:4,
-					currentPage:1,
-					maxPage:2,
-					datas:[
-					{name:"Visual Studio","id":"1",type:"target",page:1,sytem:""},
-					{name:"QQ","id":"2",type:"target",page:1,sytem:""},
-					{name:"PhotoShop","id":"3",type:"other",page:1,sytem:""},
-					{name:"CDA","id":"4",type:"other",page:1,sytem:""},
-					{name:"QQ","id":"5",type:"other",page:2,sytem:""},
-					{name:"PhotoShop","id":"6",type:"other",page:2,sytem:""},
-					{name:"CDA","id":"7",type:"other",page:2,sytem:""},
-					]
-				},
-			},
-			],
-		},
-		]
+		targetSearchDatas:[]
 	},
 	mutations:{
         //初始化首页的信息
@@ -524,6 +355,7 @@ const store=new Vuex.Store({
 		}
 	},
 });
+
 //--------------路由配置-----------------
 const Routers=[
 {
