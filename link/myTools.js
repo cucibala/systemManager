@@ -1,6 +1,6 @@
-export default{
-	loadScript(url){
-		return new Promise((reslove,reject)=>{
+export default {
+	loadScript(url) {
+		return new Promise((reslove, reject) => {
 			const jsNode = document.createElement('script');
 			jsNode.type = 'text/javascript';
 			jsNode.src = url;
@@ -19,44 +19,35 @@ export default{
 	 * 		0  两个时间相等
 	 * 		1  date1大于date2
 	 */
-	compareTime(time1,time2){
-		if(!time1||!time1){
+	compareTime(time1, time2) {
+		if (!time1 || !time1) {
 			console.log("输入不能为空");
 			return -1;
 		}
-		
-		var time1Splite=time1.split(":");
-		var time2Splite=time2.split(":");
-		var result=0;
-		if(time1Splite.length!==2||time2Splite.length!==2){
-			console.log("输入格式不正确",time1Splite,time2Splite)
+
+		var time1Splite = time1.split(":");
+		var time2Splite = time2.split(":");
+		var result = 0;
+		if (time1Splite.length !== 2 || time2Splite.length !== 2) {
+			console.log("输入格式不正确", time1Splite, time2Splite)
 			return -1;
 		}
-		
-		do{
-			if(time1Splite.length===0){
+
+		do {
+			if (time1Splite.length === 0) {
 				break;
 			}
-			
-			var t1=Number(time1Splite.shift());
-			var t2=Number(time2Splite.shift());
-			if((t1!=0&&!t1)||(t2!=0&&!t2)){
-				console.log("输入格式不正确",t1,t2)
+
+			var t1 = Number(time1Splite.shift());
+			var t2 = Number(time2Splite.shift());
+			if ((t1 != 0 && !t1) || (t2 != 0 && !t2)) {
+				console.log("输入格式不正确", t1, t2)
 				return -1;
 			}
-			
-			if(t1>t2){
-				result=1;
-				break;
-			}
-			
-			if(t1<t2){
-				result=-1;
-				break;
-			}
-			
-		}while(true);
-		
+
+			result=t2-t1;
+		} while (true);
+
 		return result;
 	},
 	/**
@@ -68,44 +59,80 @@ export default{
 	 * 		0  两个时间相等
 	 * 		1  date1大于date2
 	 */
-	compareDate(date1,date2){
-		if(!date1||!date2){
+	compareDate(date1, date2) {
+		if (!date1 || !date2) {
 			console.log("输入不能为空");
 			return -1;
 		}
-		
-		var date1Splite=date1.split("-");
-		var date2Splite=date2.split("-");
-		var result=0;
-		if(date1Splite.length!==3||date2Splite.length!==3){
-			console.log("输入格式不正确",date1Splite,date2Splite);
+
+		var date1Splite = date1.split("-");
+		var date2Splite = date2.split("-");
+		if (date1Splite.length !== 3 || date2Splite.length !== 3) {
+			console.log("输入格式不正确", date1Splite, date2Splite);
 			return -1;
 		}
-		
-		do{
-			if(date1Splite.length===0){
-				break;
+
+		const _date1=new Date().createTime(date1);
+		const _date2=new Date().createTime(date2);
+		const sceond=Number(_date2-_date1)/1000;
+		const minute=sceond/60;
+		const hour=minute/60;
+		const day=hour/24;
+		return day;
+	},
+	/**
+	 * 导入扩展函数
+	 * @param {Object} fmt
+	 */
+	importExtend() {
+		//时间的扩展，转换为指定格式
+		Date.prototype.format = function(fmt) {
+			var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+			};
+			if (/(y+)/.test(fmt)) {
+				fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
 			}
-			
-			var t1=Number(date1Splite.shift());
-			var t2=Number(date2Splite.shift());
-			if((t1!=0&&!t1)||(t2!=0&&!t2)){
-				console.log("输入格式不正确",t1,t2);
+
+			for (var k in o) {
+				if (new RegExp("(" + k + ")").test(fmt)) {
+					fmt = fmt.replace(
+						RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length))
+						);
+				}
+			}
+			return fmt;
+		}
+		
+		/**
+		 * 设置一个时间，返回一个时间对象
+		 * @param {String}  formatStr
+		 */
+		Date.prototype.createTime=formatStr=>{
+			var dateSplite = formatStr.split("-");
+			var result = 0;
+			if (dateSplite.length !== 3) {
+				console.log("输入格式不正确", dateSplite);
 				return -1;
 			}
 			
-			if(t1>t2){
-				result=1;
-				break;
+			var result=new Date();
+			try{
+				result.setFullYear(Number(dateSplite[0]));
+				result.setMonth(Number(dateSplite[1]));
+				result.setDate(Number(dateSplite[2]));
+			}catch(exception){
+				console.log("输入格式不正确", dateSplite);
+				return -1;
 			}
 			
-			if(t1<t2){
-				result=-1;
-				break;
-			}
-			
-		}while(true);
-		
-		return result;
+			return result;
+		};
 	}
 }

@@ -10,36 +10,15 @@ import webconfig from "./web.config.js";
 import md5 from "md5";
 import myTools from './link/myTools.js'     //引入公用js
 
-Date.prototype.format = function(fmt){
-  var o = {
-    "M+" : this.getMonth()+1,                 //月份
-    "d+" : this.getDate(),                    //日
-    "h+" : this.getHours(),                   //小时
-    "m+" : this.getMinutes(),                 //分
-    "s+" : this.getSeconds(),                 //秒
-    "q+" : Math.floor((this.getMonth()+3)/3), //季度
-    "S"  : this.getMilliseconds()             //毫秒
-  };
-
-  if(/(y+)/.test(fmt)){
-    fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
-  }
-        
-  for(var k in o){
-    if(new RegExp("("+ k +")").test(fmt)){
-      fmt = fmt.replace(
-        RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));  
-    }       
-  }
-
-  return fmt;
-}
-Vue.prototype.myTools = myTools;    
+//导入工具类的扩展方法
+myTools.importExtend();
+Vue.prototype.myTools = myTools;
 axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
 var test=false;
+
 function baseDull(array){
 	array.forEach(item=>{
 		try{
@@ -58,6 +37,7 @@ function baseDull(array){
 				}
 				pageCompute++;
 			});
+			
 			tempsoftwares.datas=item.softwares;
 			item.softwares=tempsoftwares;
 			item.title=item.room;
@@ -68,6 +48,7 @@ function baseDull(array){
 	});
 	return array;
 }
+
 const store=new Vuex.Store({
 	state:{
         //是否显示MenuBar
@@ -136,6 +117,7 @@ const store=new Vuex.Store({
 			if(!token||token!="true"){
 				return;
 			}
+			
 			state.refreshPage=!state.refreshPage;
 		},
 		//悬浮窗消息添加一条悬浮窗消息
@@ -218,6 +200,7 @@ const store=new Vuex.Store({
 					}
 					pageCompute++;
 				});
+				
 				tempsoftwares.datas=softwareList;
 				roomObj.state="able";
 				roomObj.softwares=tempsoftwares;
@@ -241,6 +224,7 @@ const store=new Vuex.Store({
 							roomItem.softwares.forEach(item1=>{
 								item.softwares.datas.push(item1);
 							});
+							
 							item.softwares.total=item.softwares.datas.length;
 							item.softwares.pageSize=4;
 							item.softwares.currentPage=1;
@@ -255,6 +239,7 @@ const store=new Vuex.Store({
 								}
 								pageCompute++;
 							});
+							
 							item.appendMsg=roomItem.appendMsg;
 							item.useable=roomItem.useable;
 							item.peopleCpa=roomItem.peopleCpa;
@@ -288,6 +273,7 @@ const store=new Vuex.Store({
 				console.log(webconfig.address()+"api/Search");
 				return;
 			}
+			
 			let _this=this;
 			state.isGettingData=true;
 			let skeys=$.cookie('skeys');
@@ -339,6 +325,8 @@ const store=new Vuex.Store({
 						array.forEach(item=>{
 							datas.push(item);
 						});
+						
+						
 						state.targetSearchDatas.push({bindID:arraylegnth,datas,ts});
 						state.isGettingData=false;
 					}
@@ -385,6 +373,13 @@ const Routers=[
 		title:'用户'
 	},
 	component:(resolve)=>require(['./views/user.vue'],resolve)
+},
+{
+	path:'/manager',
+	meta:{
+		title:'管理员'
+	},
+	component:(resolve)=>require(['./views/manager.vue'],resolve)
 },
 {
 	path:'/contact',

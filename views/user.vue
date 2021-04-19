@@ -30,52 +30,166 @@
 		</div>
 		<!-- 选择第二个的时候显示的东西 -->
 		<div class="mainContainer" v-if="activeSwitch==2">
-			<div class="leftWindow absoluteBox">
-				<div class="innerItem">
-					<span @click="progresSwitchClick(1)" :state="activeProgresSwitch==1">506教室 11.2-11.6</span>
+			<!-- <div class="leftWindow absoluteBox">
+				<template v-for="(data,index) in progressDatas">
+					<div class="innerItem" @click="progresSwitchClick(index)" :state="activeProgresSwitch==index">
+						<span>{{data[0].BuildName}}</span>
+						<span>{{data[0].RoomName}}</span>
+					</div>
+				</template>
+			</div> -->
+			<div class="innerContainer absoluteBox">
+				<div id="progressDetailTitle">
+					<span>教学楼</span>
+					<span>教室</span>
+					<span>开始日期</span>
+					<span>结束日期</span>
+					<span>时间段</span>
+					<span>提交时间</span>
+					<span>审核状态</span>
 				</div>
-				<div class="innerItem">
-					<span @click="progresSwitchClick(2)" :state="activeProgresSwitch==2">506教室 11.2-11.6</span>
-				</div>
-				<div class="innerItem">
-					<span @click="progresSwitchClick(3)" :state="activeProgresSwitch==3">506教室 11.2-11.6</span>
-				</div>
-				<div class="innerItem">
-					<span @click="progresSwitchClick(4)" :state="activeProgresSwitch==4">506教室 11.2-11.6</span>
-				</div>
-			</div>
-			<div class="rightWindow absoluteBox">
-				
+					<template v-for="progressData in progressDatas">
+						<template v-for="data in progressData">
+							<div class="progressDetailConatiner">
+								<span>{{data.BuildName}}</span>
+								<span>{{data.RoomName}}</span>
+								<span>{{data.state.StartDate.substr(0,10)}}</span>
+								<span>{{data.state.EndDate.substr(0,10)}}</span>
+								<span>{{data.state.StartTime.substr(11,5)}}-{{data.state.EndTime.substr(11,5)}}</span>
+								<span>{{data.state.CreateTime.substr(0,10)}}</span>
+								<span v-if="data.state.ApplyState ==='APPL'">等待审核</span>
+								<span v-else="data.state.ApplyState ==='AGRE'">审核通过</span>
+							</div>
+						</template>
+					</template>
 			</div>
 		</div>
 	</div>
 </template>
 <script type="text/javascript">
+	import $ from "jquery";
+	import webconfig from "../web.config.js";
+	import md5 from "md5";
+	var _this;
 	export default{
 		data(){
 			return {
-				activeSwitch:2,
-				activeProgresSwitch:-1,
+				activeSwitch:1,
+				//activeProgresSwitch:-1,
 				userMsg:{
-					name:"haysu",
-					account:"879218254",
-					level:"2",
-					creatTime:"2020-5-6",
+					name:"",
+					account:"",
+					level:"",
+					creatTime:"",
+				},
+				progressDatas:[]//RoomName":"hello","BuildName":"worle"},{"state":{"UseStateId":2021181210187789,"UserId":"2","RoomId":"56847","StartDate":"2021-04-12T00:00:00","EndDate":"2021-04-17T00:00:00","StartTime":"1999-01-01T12:18:00","EndTime":"1999-01-01T16:18:00","Monday":true,"Tuesday":false,"Wednesday":false,"Thursday":true,"Friday":true,"Saturday":true,"Sunday":true,"Reson":"","ApplyState":"APPL","room_":null,"user_":null},"RoomName":"12333","BuildName":"123"},{"state":{"UseStateId":2021061308064052,"UserId":"2","RoomId":"25930","StartDate":"2021-04-13T00:00:00","EndDate":"2021-04-13T00:00:00","StartTime":"1999-01-01T08:06:00","EndTime":"1999-01-01T08:06:00","Monday":true,"Tuesday":false,"Wednesday":false,"Thursday":false,"Friday":false,"Saturday":false,"Sunday":false,"Reson":"","ApplyState":"APPL","room_":null,"user_":null},"RoomName":"404","BuildName":"第一教学楼"}
+			}
+		},
+		computed:{
+			currentProgressData(){
+				if(this.activeProgresSwitch<0){
+					return undefined;
 				}
+				
+				if(this.progressDatas.length<this.activeProgresSwitch){
+					return undefined;
+				}
+				
+				const result=this.progressDatas[this.activeProgresSwitch];
+				console.log(result);
+				return result;
 			}
 		},
 		methods:{
 			switchClick(e){
+				if(this.activeSwitch===e){
+					return;
+				}
+				
 				this.activeSwitch=e;
+				if(e=="2"){
+					this.postForm(2);
+				}
+				
 			},
 			progresSwitchClick(e){
 				this.activeProgresSwitch=e;
+				console.log(e);
+			},
+			setProgressMsg(data){
+				this.progressDatas=data;
+				console.log(data);
+				
+			},
+			setUserMsg(data){
+				this.userMsg.creatTime=data.CreateTime.substr(0,10);
+				this.userMsg.name=data.UserName;
+				this.userMsg.account=data.UserId;
+				this.userMsg.level=data.UserLevel;
+			},
+			/**
+			 * 发送表单获取数据
+			 * @param {Object} opreate 1.获取基本信息 2.获取进度信息
+			 */
+			postForm(opreate){
+				let skeys=$.cookie('skeys');
+				let account=$.cookie('account');
+				if(!skeys||!account){
+					_this.$store.commit('addPromtMessage',"登陆过期");
+					return;
+				}
+				
+				const md5Value=md5(account+opreate+skeys);
+				this.axios({
+					method: 'post',
+					url: webconfig.address()+"api/User",
+					headers: {"Content-Type": "Content-type: application/json"},
+					data:{
+						account,
+						opreate,
+						md5Value,
+					}
+				}).then(res=>{
+					const resDate=res.data;
+					console.log(resDate);
+					if(resDate.code==="200"){
+						var data=JSON.parse(resDate.data);
+						switch(opreate){
+							case 1:{
+								_this.setUserMsg(data);
+								break;
+							}
+							case 2:{
+								_this.setProgressMsg(data);
+								break;
+							}
+							default:{
+								_this.$store.commit('addPromtMessage',"未知的操作类型");
+								break;
+							}
+						}
+						
+					}else{
+						_this.$store.commit('addPromtMessage',resDate.msg);
+					}
+					
+				}).catch(ex=>{
+					_this.$store.commit('addPromtMessage',ex.Message);
+				});
+				
 			}
+		},
+		mounted(){
+			_this=this;
+			this.postForm(1);
 		}
 	}
 </script>
 <style type="text/css" lang="less" scoped>
-
+@min624:~"(min-width: 624px)";
+@pcSize:~"(min-width: 1024px)";
+@middleSize:~"(min-width: 624px) and (max-width: 1024px)";
+@phoneSize:~"(max-width: 624px)";
 @keyframes myfirst
 {
 	from {width: 0px;}
@@ -136,8 +250,9 @@
 		padding: 4px;
 		z-index: 2;
 		.innerItem{
+			display: flex;
+			flex-direction: row;
 			span{
-				width:100%;
 				display: inline-block;
 				cursor: pointer;
 				white-space: nowrap;
@@ -149,20 +264,82 @@
 				text-overflow:ellipsis;
 				background-color:#008d57;
 			}
-			span[state="true"]{
-				background-color:#008d57;
-				border:2px dashed #ffffff;
-				width:calc(100% - 4px);
-				color:white;
-			}
+		}
+		.innerItem[state="true"]{
+			background-color:#008d57;
+			border:2px dashed #ffffff;
+			width:calc(100% - 4px);
+			color:white;
 		}
 	}
-	.rightWindow{
-		right: @containerPadding;
-		width:calc((100% - @leftWindowSize) - @containerPadding - 8px);
+	.innerContainer{
+		left: @containerPadding;
+		width:calc(100% - (@containerPadding*2) - 8px);
 		height: calc(100% - (@containerPadding*2));
 		padding: 4px;
+		display: flex;
+		flex-direction: column;
 		z-index: 1;
+		overflow: auto;
+		#progressDetailTitle{
+			display: inherit;
+			flex-direction: row;
+			margin: 4px 0px;
+			justify-content : space-between;
+			span{
+				white-space: nowrap;
+				text-align:left;
+				margin: 0px 1px;
+			}
+			@media @min624{
+				span{
+					width: 100%;
+					flex-wrap: nowrap;
+				}
+			}
+			@media @phoneSize{
+				span:not(:hover){
+					overflow:hidden;
+					text-overflow:ellipsis;
+				}
+				span:hover{
+					background-color: #008d57;
+					color:white;
+				}
+			}
+		}
+		.progressDetailConatiner{
+			display: inherit;
+			flex-direction: row;
+			margin: 4px 0px;
+			justify-content : space-between;
+			border: solid 2px #123321;
+			padding: 3px 0px;
+			span{
+				white-space: nowrap;
+				text-align:left;
+				margin: 0px 1px;
+				
+			}
+			@media @min624{
+				span{
+					width: 100%;
+					flex-wrap: nowrap;
+				}
+			}
+			@media @phoneSize{
+				span:not(:hover){
+					width: 200px;
+					overflow:hidden;
+					text-overflow:ellipsis;
+				}
+				span:hover{
+					background-color: #008d57;
+					color:white;
+					border: 2px solid #4422ff;
+				}
+			}
+		}
 	}
 }
 .topMarigin{

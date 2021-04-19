@@ -12,6 +12,9 @@
 					<li @click="menuClick">
 						<router-link  to="/user" >我的</router-link>
 					</li>
+					<li @click="menuClick" v-if="userMsg.level==2">
+						<router-link  to="/manager" >管理员</router-link>
+					</li>
 					<li @click="menuClick">
 						<router-link  to="/contact" >留言</router-link>
 					</li>
@@ -46,6 +49,7 @@
 		data(){
 			return{
 				menuOn:false,
+				
 			}
 		},
 		computed:{
@@ -56,6 +60,9 @@
 					return "";
 				}
 
+			},
+			userMsg(){
+				return this.$store.state.user;
 			}
 		},
 		methods:{

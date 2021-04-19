@@ -193,8 +193,8 @@
 					<template v-slot:calendarMiddleAbsoluteWindow>
 						<div v-if="applyManager.applyWindowState=='show'" id="applyRoomWindow">
 							<div>
-								<div><label>开始日期: </label><input type="date" v-model="applyManager.applyForm.startDate"/></div>
-								<div><label>结束日期: </label><input type="date" v-model="applyManager.applyForm.endDate"/></div>
+								<div><label>开始日期: </label><input type="date" v-model="applyManager.applyForm.startDate"  @change="applyManager.dateChange('startDate')"/></div>
+								<div><label>结束日期: </label><input type="date" v-model="applyManager.applyForm.endDate"  @change="applyManager.dateChange('endDate')"/></div>
 								<div><label>时间段: </label><input type="time" v-model="applyManager.applyForm.startTime"/> -> <input type="time" v-model="applyManager.applyForm.endTime"/></div>
 								<div>
 								    <span>周一<input name="week" type="checkbox" value="1" v-model="applyManager.applyForm.week.mon"/></span>
@@ -333,12 +333,44 @@ export default{
 					week:{mon:false,tue:false,wed:false,thur:false,fri:false,sat:false,sun:false},
 					reason:"",
 				},
+				dateChange(dateType){
+					//console.log(,);
+					const now=new Date();
+					const startDate=this.applyForm.startDate;
+					const endDate=this.applyForm.endDate;
+					const dateMinus=_this.myTools.compareDate(startDate,endDate);
+					if(dateMinus>=7){
+						return;
+					}
+					
+					if(dateType==="startDate"){
+						let tempDate=now.createTime(startDate);
+						tempDate.setMonth(tempDate.getMonth()-1);
+						tempDate.setDate(tempDate.getDate()+7);
+						tempDate=tempDate.format("yyyy-MM-dd");
+						this.applyForm.endDate=tempDate;
+						return;
+					}
+					
+					if(dateType==="endDate"){
+						let tempDate=now.createTime(endDate);
+						tempDate.setMonth(tempDate.getMonth()-1);
+						tempDate.setDate(tempDate.getDate()-7);
+						tempDate=tempDate.format("yyyy-MM-dd");
+						this.applyForm.startDate=tempDate;
+						return;
+					}
+					
+				},
 				/**
 				 * 初始化data的数据
 				 * @param {Object} build 教学楼的名字
 				 * @param {Object} room 房间的名字
 				 */
 				initData(build,room){
+					//初始化表单信息
+					this.resetApplyForm();
+					//设置日期信息
 					let formData=new FormData();
 					let skeys=$.cookie('skeys');
 					let account=$.cookie('account');
@@ -416,8 +448,8 @@ export default{
 					var today=new Date();
 					this.applyForm.startDate=today.format("yyyy-MM-dd");
 					this.applyForm.endDate=today.format("yyyy-MM-dd");
-					this.applyForm.startTime="08:00";
-					this.applyForm.endTime="17:18";
+					this.applyForm.startTime=today.format("hh:mm");
+					this.applyForm.endTime=today.format("hh:mm");
 					this.applyForm.reason="";
 					this.applyForm.week.mon=this.applyForm.week.tue=this.applyForm.week.wed=this.applyForm.week.thur=this.applyForm.week.fri=this.applyForm.week.sat=this.applyForm.week.sun=false;
 				},
@@ -430,8 +462,8 @@ export default{
 						return;
 					}
 					
-					if(_this.myTools.compareDate(this.applyForm.startDate,this.applyForm.endDate)>0){
-						_this.$store.commit('addPromtMessage',"开始时间不能大于结束时间");
+					if(_this.myTools.compareDate(this.applyForm.startDate,this.applyForm.endDate)<0){
+						_this.$store.commit('addPromtMessage',"开始日期不能大于结束日期");
 						return;
 					}
 					
@@ -444,6 +476,9 @@ export default{
 						_this.$store.commit('addPromtMessage',"请至少选择一天");
 						return;
 					}
+					
+					
+					
 					
 					this.applyForm.room=this.data.room;
 					this.applyForm.build=this.data.build;
@@ -535,6 +570,12 @@ export default{
 							return;
 						}
 					}
+					
+					
+					
+					
+					
+					
 					
 					_this.$store.commit("getData",{opreate:"search",ts:JSON.stringify(this.data)});
 				},
@@ -773,6 +814,7 @@ export default{
                 }
                 this.$store.commit('addPromtMessage',"重置成功");
             }
+			
             data.softwares.splice(0,data.softwares.length);
             data.room="";
             data.build="";
@@ -1100,8 +1142,11 @@ export default{
                     width: 100%;
                     height: 120px;
                     position: relative;
+					display: flex;
+					flex-direction: column;
                     .ele{
                         margin-top: 2px;
+						margin-bottom: 4px;
                         width:calc(100% - 24px);
                         font-size: 13px;
                         padding-left:20px;
