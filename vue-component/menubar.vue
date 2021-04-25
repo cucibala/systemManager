@@ -13,7 +13,7 @@
 						<router-link  to="/user" >我的</router-link>
 					</li>
 					<li @click="menuClick" v-if="userMsg.level==2">
-						<router-link  to="/manager" >管理员</router-link>
+						<router-link  to="/manager" >审核</router-link>
 					</li>
 					<li @click="menuClick">
 						<router-link  to="/contact" >留言</router-link>

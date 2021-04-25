@@ -17,7 +17,7 @@ axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
-var test=false;
+var test=true;
 
 function baseDull(array){
 	array.forEach(item=>{
@@ -55,7 +55,9 @@ const store=new Vuex.Store({
 		showMenuBar:true,
         //首页的图片地址
 		indexImages:"",
-		user:"",
+		user:{
+			level:2
+		},
         //flag
 		refreshPage:false,
         //当前提示的消息
