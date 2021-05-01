@@ -86,17 +86,18 @@
 		},
 		mounted(){
 			let _this=this;
-			/*vaptcha({
-      			vid: '5f8aafec7308a5b75b44ce01', // 验证单元id
-      			type: 'click', // 展现类型 点击式
-      			container: '#vaptchaContainer', // 按钮容器，可为Element 或者 selector
-      		}).then(function (vaptchaObj) {
-     			vaptchaObj.render()// 调用验证实例 vaptchaObj 的 render 方法加载验证按钮
-     			_this.vaptcha=vaptchaObj;
-     			vaptchaObj.listen("pass",function(){
-     				_this.rgToken=vaptchaObj.getToken();
-     			});
-     		});*/
+            //TODO 正式发布时可以打开这里这里是验证码
+			// vaptcha({
+      		// 	vid: '5f8aafec7308a5b75b44ce01', // 验证单元id
+      		// 	type: 'click', // 展现类型 点击式
+      		// 	container: '#vaptchaContainer', // 按钮容器，可为Element 或者 selector
+      		// }).then(function (vaptchaObj) {
+     		// 	vaptchaObj.render()// 调用验证实例 vaptchaObj 的 render 方法加载验证按钮
+     		// 	_this.vaptcha=vaptchaObj;
+     		// 	vaptchaObj.listen("pass",function(){
+     		// 		_this.rgToken=vaptchaObj.getToken();
+     		// 	});
+     		// });
 		}
 	}
 </script>

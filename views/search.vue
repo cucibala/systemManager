@@ -477,9 +477,6 @@ export default{
 						return;
 					}
 					
-					
-					
-					
 					this.applyForm.room=this.data.room;
 					this.applyForm.build=this.data.build;
 					let skeys=$.cookie('skeys');
@@ -559,13 +556,13 @@ export default{
 				 * 搜索指定的内容
 				 */
 				postForm(){
-					if(_this.myTools.compareDate(this.data.startDate,this.data.endDate)>0){
+					if(_this.myTools.compareDate(this.data.startDate,this.data.endDate)<0){
 						_this.$store.commit('addPromtMessage',"开始时间不能大于结束时间");
 						return;
 					}
 					
 					for(var i=0;i<this.data.timeSpan.length;i++){
-						if(_this.myTools.compareTime(this.data.timeSpan[i].start,this.data.timeSpan[i].end)>0){
+						if(_this.myTools.compareTime(this.data.timeSpan[i].start,this.data.timeSpan[i].end)<0){
 							_this.$store.commit('addPromtMessage',`第${i+1}个时间段,开始时间不能大于结束时间`);
 							return;
 						}

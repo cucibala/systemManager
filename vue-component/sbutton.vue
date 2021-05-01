@@ -39,7 +39,8 @@
 	cursor: pointer;
 	user-select:none;
 	transition: all 2s ease 0s;
-	background-color: #0067b8;
+	background-color: #008D57;
+	color: white;
 	position: relative;
 	overflow: hidden;
 	vertical-align: middle;
