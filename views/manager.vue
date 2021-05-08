@@ -23,36 +23,36 @@
 					<div>
 						<sbutton @mdEvent="applyManager.postOpreate('pass')" style="margin: 0px 4px;">通过选中</sbutton>
 						<sbutton @mdEvent="applyManager.postOpreate('nopass')" style="margin: 0px 4px;">拒绝选中</sbutton>
-						<p>{{applyManager.checkList.length}} / {{applyManager.data.length}}</p>
+						<p>{{applyManager.applyList.length}} / {{applyManager.data.length}}</p>
 					</div>
 					<div>
-						<sbutton v-if="applyManager.checkList.length==applyManager.data.length" @mdEvent="applyManager.toggleCheckAll(false)">取消全选</sbutton>
+						<sbutton v-if="applyManager.applyList.length==applyManager.data.length" @mdEvent="applyManager.toggleCheckAll(false)">取消全选</sbutton>
 						<sbutton v-else @mdEvent="applyManager.toggleCheckAll(true)">全选</sbutton>
 					</div>
 				</div>
 				<div id="progressListContainer">
 					<template v-for="data in applyManager.data">
-						<div class="progressApplyItem" :checked="applyManager.checkList.indexOf(data.applyID)!=-1" @click="applyManager.onApplyCheck(data.applyID,true)">
+						<div class="progressApplyItem" :checked="applyManager.applyList.indexOf(data.UseStateId)!=-1" @click="applyManager.onApplyCheck(data.UseStateId,true)">
 							<div>
-								<div>-{{data.name}}</div>
+								<div>-{{data.UserName}}</div>
 							</div>
 							<div>
-								<div>{{data.build}}{{data.room}}</div>
-								<div>{{data.startDate}} ～ {{data.endDate}}</div>
-								<div>{{data.startTime}}-{{data.endTime}}</div>
+								<div>{{data.BuildName}} {{data.RoomName}}</div>
+								<div>{{data.StartDate}} {{data.EndDate}}</div>
+								<div>{{data.StartTime}} {{data.EndTime}}</div>
 								<div>
-									<span v-if="data.week[0]">一</span>
-									<span v-if="data.week[1]">二</span>
-									<span v-if="data.week[2]">三</span>
-									<span v-if="data.week[3]">四</span>
-									<span v-if="data.week[4]">五</span>
-									<span v-if="data.week[5]">六</span>
-									<span v-if="data.week[6]">日</span>
+									<span v-if="data.Monday">一</span>
+									<span v-if="data.Tuesday">二</span>
+									<span v-if="data.Thursday">三</span>
+									<span v-if="data.Wednesday">四</span>
+									<span v-if="data.Friday">五</span>
+									<span v-if="data.Saturday">六</span>
+									<span v-if="data.Sunday">日</span>
 								</div>
 							</div>
 							<div>
 								<div>申请日期</div>
-								<div>三天前</div>
+								<div>{{data.CreateTime}}</div>
 							</div>
 						</div>
 					</template>
@@ -69,7 +69,11 @@
 </template>
 
 <script>
+	var _this;
 	import sbutton from "../vue-component/sbutton.vue";
+	import md5 from "md5";
+	import $ from "jquery";
+	import webconfig from "../web.config.js";
 	export default{
 		components:{
 		    sbutton,
@@ -83,25 +87,18 @@
 					{index:2,title:"留言管理"},
 				],
 				applyManager:{
-					data:[
-						{room:"405",build:"第一教学楼",name:"张三封",startDate:"2021-01-05",endDate:"2021-02-06",
-						startTime:"15:36",
-						endTime:"17:38",
-						week:[true,false,false,true,false,true,true],
-						applyID:"12123156",
-						},
-					],
-					checkList:[],
+					data:[],
+					applyList:[],
 					/**
 					 * 取消或者全选
 					 */
 					toggleCheckAll(check){
 						if(check){
 							this.data.forEach(item=>{
-								this.onApplyCheck(item.applyID,false);
+								this.onApplyCheck(item.UseStateId,false);
 							});
 						}else{
-							this.checkList.splice(0);
+							this.applyList.splice(0);
 						}
 						
 					},
@@ -111,27 +108,102 @@
 					 * @param toogle 是否删除
 					 */
 					onApplyCheck(applyID,toogle){
-						const index=this.checkList.indexOf(applyID);
+						const index=this.applyList.indexOf(applyID);
 						if(index!=-1){
 							if(toogle){
-								this.checkList.splice(index,1);
+								this.applyList.splice(index,1);
 							}
 							
 						}else{
-							this.checkList.push(applyID);
+							this.applyList.push(applyID);
 						}
 					},
 					/**
 					 * 刷新数据
 					 */
 					refresh(){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						const action="apply";
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							return;
+						}
 						
+						const md5Value=md5(`${account}${action}${skeys}`);
+						_this.axios({
+							methods:"get",
+							url: webconfig.address()+"api/Manager",
+							headers:{
+								"Content-Type":"application/x-www-form-urlencoded"
+							},
+							params:{
+								account,
+								md5Value,
+								action,
+							}
+						}).then(res=>{
+							const resData=res.data;
+							if(resData.code=="200"){
+								const applyData=JSON.parse(resData.data);
+								this.data.splice(0);
+								applyData.forEach(item=>{
+									item.StartDate=item.StartDate.substr(0,10);
+									item.EndDate=item.EndDate.substr(0,10);
+									item.StartTime=item.StartDate.substr(11,7);
+									item.EndTime=item.StartDate.substr(11,7);
+									item.CreateTime=item.CreateTime.substr(0,10);
+									this.data.push(item);
+								});
+							}else{
+								//TODO:获取信息失败 
+								_this.$store.commit('addPromtMessage',resData.msg);
+								console.log("asdasd");
+							}
+							
+						}).catch(ex=>{
+							 _this.$store.commit('addPromtMessage',ex.message);
+						});
 					},
 					/**
 					 * 推送操作
 					 */
 					postOpreate(opreate){
-						console.log(opreate);
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						const action="apply";
+						const applyList=this.applyList;
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							return;
+						}
+						
+						const md5Value=md5(`${account}${action}${opreate}${JSON.stringify(applyList)}${skeys}`);
+						console.log(`${account}${action}${opreate}${JSON.stringify(applyList)}${skeys}`);
+						_this.axios({
+							method:"post",
+							url: webconfig.address()+"api/Manager",
+							headers:{
+								"Content-Type":"Content-type: application/json"
+							},
+							data:{
+								account,
+								action,
+								opreate,
+								applyList,
+								md5Value,
+							}
+						}).then(res=>{
+							const resData=res.data;
+							
+							console.log(res);
+						}).catch(ex=>{
+							console.log(ex);
+						});
+						
+						
+						
+						// console.log(opreate);
 					}
 				}
 			}
@@ -162,7 +234,8 @@
 
 		},
 		mounted(){
-			console.log(this.userMsg);
+			_this=this;
+			this.applyManager.refresh();
 		}
 	}
 </script>

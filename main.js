@@ -17,7 +17,7 @@ axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
-var test=true;
+var test=false;
 
 function baseDull(array){
 	array.forEach(item=>{
