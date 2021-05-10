@@ -18,11 +18,11 @@
 			<div class="subViewContainer" :choice="indexPath[0].index==currentActiveIndex">
 				<div class="topBar">
 					<div>
-						<sbutton @mdEvent="applyManager.refresh()">刷新</sbutton>
+						<sbutton @mdEvent="applyManager.refresh()" :lockClick="applyManager.refreshBtnLock">刷新</sbutton>
 					</div>
 					<div>
-						<sbutton @mdEvent="applyManager.postOpreate('pass')" style="margin: 0px 4px;">通过选中</sbutton>
-						<sbutton @mdEvent="applyManager.postOpreate('nopass')" style="margin: 0px 4px;">拒绝选中</sbutton>
+						<sbutton @mdEvent="applyManager.postOpreate('pass')" style="margin: 0px 4px;" :lockClick="applyManager.passApplyBtnLock">通过选中</sbutton>
+						<sbutton @mdEvent="applyManager.postOpreate('nopass')" style="margin: 0px 4px;" :lockClick="applyManager.noPassApplyBtnLock">拒绝选中</sbutton>
 						<p>{{applyManager.applyList.length}} / {{applyManager.data.length}}</p>
 					</div>
 					<div>
@@ -30,7 +30,7 @@
 						<sbutton v-else @mdEvent="applyManager.toggleCheckAll(true)">全选</sbutton>
 					</div>
 				</div>
-				<div id="progressListContainer">
+				<div class="bottomContainer">
 					<template v-for="data in applyManager.data">
 						<div class="progressApplyItem" :checked="applyManager.applyList.indexOf(data.UseStateId)!=-1" @click="applyManager.onApplyCheck(data.UseStateId,true)">
 							<div>
@@ -59,7 +59,72 @@
 				</div>
 			</div>
 			<div class="subViewContainer" :choice="indexPath[1].index==currentActiveIndex">
-				2
+				<div class="topBar">
+					<div>
+						<!-- 上方的toolbar -->
+						<sbutton @mdEvent="userManager.refresh()" :lockClick="userManager.refreshBtnLock">刷新</sbutton>
+					</div>
+					<div>
+						<!-- 中间的toolbar -->
+					</div>
+					<div>
+						<!-- TODO:完成新增的逻辑 -->
+						<!-- <sbutton @mdEvent="userManager.refresh()">新增</sbutton> -->
+					</div>
+				</div>
+				<div class="bottomContainer">
+					<div class="userItem">
+						<div class="itemCell">
+							<span>账号:</span>
+							<input type="text"  v-model="userManager.tempUserMsg.UserId" class="smallInput"/>
+						</div>
+						<div class="itemCell">
+							<span>姓名:</span>
+							<input type="text" v-model="userManager.tempUserMsg.UserName" class="smallInput"/>
+						</div>
+						<div class="itemCell">
+							<span>密码:</span>
+							<input type="text" v-model="userManager.tempUserMsg.password" class="smallInput"/>
+						</div>
+						<div class="itemCell">
+							<span>等级:</span>
+							<select v-model="userManager.tempUserMsg.UserLevel">
+								<option value="0">学生</option>
+								<option value="1">老师</option>
+								<option value="2">管理员</option>
+							</select>
+						</div>
+						<sbutton @mdEvent="userManager.modify(userManager.tempUserMsg,1)">新增</sbutton>
+					</div>
+					<template v-for="data in userManager.data">
+						<div class="userItem">
+							<div class="itemCell">
+								<span>账号:</span>
+								<input type="text" readonly="readonly" :value="data.UserId" class="smallInput"/>
+							</div>
+							<div class="itemCell">
+								<span>姓名:</span>
+								<input type="text" v-model="data.UserName" class="smallInput"/>
+							</div>
+							<div class="itemCell">
+								<span>密码:</span>
+								<input type="text" v-model="data.password" class="smallInput"/>
+							</div>
+							<div class="itemCell">
+								<span>等级:</span>
+								<select v-model="data.UserLevel">
+									<option value="0">学生</option>
+									<option value="1">老师</option>
+									<option value="2">管理员</option>
+								</select>
+							</div>
+							
+							
+							<sbutton @mdEvent="userManager.modify(data,0)">修改</sbutton>
+							<sbutton @mdEvent="userManager.modify(data,2)">删除</sbutton>
+						</div>
+					</template>
+				</div>
 			</div>
 			<div class="subViewContainer" :choice="indexPath[2].index==currentActiveIndex">
 				3
@@ -80,7 +145,7 @@
 		},
 		data(){
 			return {
-				currentActiveIndex:0,
+				currentActiveIndex:1,
 				indexPath:[
 					{index:0,title:"申请审核"},
 					{index:1,title:"用户管理"},
@@ -89,6 +154,9 @@
 				applyManager:{
 					data:[],
 					applyList:[],
+					refreshBtnLock:false,
+					passApplyBtnLock:false,
+					noPassApplyBtnLock:false,
 					/**
 					 * 取消或者全选
 					 */
@@ -125,8 +193,10 @@
 						const skeys=$.cookie('skeys');
 						const account=$.cookie('account');
 						const action="apply";
+						this.refreshBtnLock=true;
 						if(!account){
 							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							this.refreshBtnLock=false;
 							return;
 						}
 						
@@ -144,25 +214,26 @@
 							}
 						}).then(res=>{
 							const resData=res.data;
+							console.log(resData);
 							if(resData.code=="200"){
 								const applyData=JSON.parse(resData.data);
 								this.data.splice(0);
 								applyData.forEach(item=>{
 									item.StartDate=item.StartDate.substr(0,10);
 									item.EndDate=item.EndDate.substr(0,10);
-									item.StartTime=item.StartDate.substr(11,7);
-									item.EndTime=item.StartDate.substr(11,7);
+									item.StartTime=item.StartTime.substr(11,5);
+									item.EndTime=item.EndTime.substr(11,5);
 									item.CreateTime=item.CreateTime.substr(0,10);
 									this.data.push(item);
+									console.log(item);
 								});
 							}else{
-								//TODO:获取信息失败 
 								_this.$store.commit('addPromtMessage',resData.msg);
-								console.log("asdasd");
 							}
-							
+							this.refreshBtnLock=false;
 						}).catch(ex=>{
 							 _this.$store.commit('addPromtMessage',ex.message);
+							this.refreshBtnLock=false;
 						});
 					},
 					/**
@@ -178,8 +249,15 @@
 							return;
 						}
 						
+						if(this.applyList.length===0){
+							_this.$store.commit('addPromtMessage',"当前没有选中申请项");
+							return;
+						}
+						
+						this.passApplyBtnLock=true;
+						this.noPassApplyBtnLock=true;
 						const md5Value=md5(`${account}${action}${opreate}${JSON.stringify(applyList)}${skeys}`);
-						console.log(`${account}${action}${opreate}${JSON.stringify(applyList)}${skeys}`);
+						var that=this;
 						_this.axios({
 							method:"post",
 							url: webconfig.address()+"api/Manager",
@@ -195,25 +273,191 @@
 							}
 						}).then(res=>{
 							const resData=res.data;
-							
-							console.log(res);
+							if(resData.code=="200"){
+								that.applyList.forEach(item=>{
+									for(var i=0;i<that.data.length;i++){
+										if(that.data[i].UseStateId==item){
+											that.data.splice(i,1);
+											break;
+										}
+									}
+								});
+								that.applyList.splice(0);
+							}else{
+								_this.$store.commit('addPromtMessage',`操作失败${resData.msg}`);
+							}
+							this.passApplyBtnLock=false;
+							this.noPassApplyBtnLock=false;
 						}).catch(ex=>{
-							console.log(ex);
+							this.passApplyBtnLock=false;
+							this.noPassApplyBtnLock=false;
+							_this.$store.commit('addPromtMessage',`操作失败${ex.message}`);
+						});
+					}
+				},
+				userManager:{
+					data:[],
+					tempUserMsg:{
+						UserId:"",
+						UserName:"",
+						UserLevel:0
+					},
+					refreshBtnLock:false,
+					/*
+					* 刷新页面数据
+					*/
+					refresh(){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						const action="user";
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							this.refreshBtnLock=false;
+							return;
+						}
+						
+						const that=this;
+						const md5Value=md5(`${account}${action}${skeys}`);
+						_this.axios({
+							methods:"get",
+							url: webconfig.address()+"api/Manager",
+							headers:{
+								"Content-Type":"application/x-www-form-urlencoded"
+							},
+							params:{
+								account,
+								md5Value,
+								action,
+							}
+						}).then(res=>{
+							const resData=res.data;
+							if(resData.code=="200"){
+								that.data.splice(0);
+								that.data=JSON.parse(resData.data);
+								console.log(res.data);
+							}else{
+								_this.$store.commit('addPromtMessage',resData.msg);
+							}
+							
+							this.refreshBtnLock=false;
+						}).catch(ex=>{
+							_this.$store.commit('addPromtMessage',ex.message);
+							this.refreshBtnLock=false;
+						});
+					},
+					/*
+					* 修改当前用户的数据
+					* @param data 被操作的数据
+					* @param opreate 当前的操作类型 0 修改 1 新增 2 删除
+					*/
+					modify(userMsg,opreate){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						const action="user";
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							this.refreshBtnLock=false;
+							return;
+						}
+						//验证更新操作是否合法
+						if(opreate==0){
+							const password=userMsg.password;
+							if(!password){
+								userMsg.password="";
+							}else if(password.length<6){
+								_this.$store.commit('addPromtMessage',"密码长度太短");
+								return;
+							}else{
+								//如果密码存在且符合要求进行md5加密
+								userMsg.password=md5(password);
+							}
+							
+						}
+						//如果是新增操作，验证参数是否合法
+						else if(opreate==1){
+							//验证密码是否合法
+							const password=userMsg.password;
+							if(!password||password.length<6){
+								_this.$store.commit('addPromtMessage',"密码不存在或密码长度太短");
+								return;
+							}
+							
+							userMsg.password=md5(password);
+							if(userMsg.UserId.length==0){
+								_this.$store.commit('addPromtMessage',"用户id不能为空");
+								return;
+							}
+							
+							if(userMsg.UserName.length==0){
+								_this.$store.commit('addPromtMessage',"用户名字不能为空");
+								return;
+							}
+						}
+						else if(opreate==2){
+							userMsg.password="";
+						}
+						
+						//因为原始UserLevel是数字性，所以进行md5加密会出问题。统一变成数字型
+						userMsg.UserLevel=Number(userMsg.UserLevel);
+						const that=this;
+						const md5Value=md5(`${account}${action}${opreate}${JSON.stringify(userMsg)}${skeys}`);
+						_this.axios({
+							method:"post",
+							url: webconfig.address()+"api/Manager",
+							headers:{
+								"Content-Type":"Content-type: application/json"
+							},
+							data:{
+								account,
+								action,
+								opreate,
+								userMsg,
+								md5Value,
+							}
+						}).then(res=>{
+							const resData=res.data;
+							if(resData.code=="200"){
+								_this.$store.commit('addPromtMessage',"操作成功");
+							}else{
+								_this.$store.commit('addPromtMessage',resData.msg);
+							}
+							that.refresh();
+						}).catch(ex=>{
+							_this.$store.commit('addPromtMessage',ex.message);
 						});
 						
 						
-						
-						// console.log(opreate);
 					}
 				}
 			}
 		},
 		methods:{
 			/**
+			 * 刷新数据
+			 */
+			refreshData(){
+				if(this.currentActiveIndex==0){
+					this.applyManager.refresh();
+				}
+				
+				if(this.currentActiveIndex==1){
+					this.userManager.refresh();
+					
+				}
+				
+				if(this.currentActiveIndex==2){
+					
+				}
+			},
+			/**
 			 * 切换到指定页面
 			 * @param {Object} index
 			 */
 			switchToPage(index){
+				if(this.currentActiveIndex==index){
+					return;
+				}
+				
 				const findItem=this.indexPath.find(item=>{
 					if(item.index==index){
 						return true;
@@ -228,6 +472,7 @@
 				}
 				
 				this.currentActiveIndex=index;
+				this.refreshData();
 			}
 		},
 		computed:{
@@ -235,7 +480,7 @@
 		},
 		mounted(){
 			_this=this;
-			this.applyManager.refresh();
+			this.refreshData();
 		}
 	}
 </script>
@@ -327,7 +572,7 @@
 				text-align: center;
 			}
 		}
-		#progressListContainer{
+		.bottomContainer{
 			height: calc(100% - @progressTopBarHeight - 8px);
 			width:  calc(100% - 8px);
 			padding: 4px;
@@ -379,6 +624,23 @@
 			.progressApplyItem:not([checked]):nth-child(even){
 				background-color: #6fd0ff;
 			}
+			.userItem{
+				width: 100%;
+				height: 50px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				font-size: @navigatorCellTitleFontSize;
+				margin: 5px 0px;
+				.itemCell{
+					margin: 0px 1px;
+				}
+				.smallInput{
+					width: 5em;
+				}
+			}
+		
 		}
 	}
 	.subViewContainer[choice]{

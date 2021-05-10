@@ -1,19 +1,38 @@
 <template>
-	<span class="sbutton" @click="onmousedown($event)" ref="tet">
+	<span class="sbutton" @click="onmousedown($event)" ref="tet" :clickable="currentClickAble">
 		<slot></slot>
 	</span>
 </template>
 <script>
 	import $ from 'jquery';
 	export default{
+		props:{
+			lockClick:{
+				type:Boolean,
+				default:false
+			}
+		},
 		data(){
 			return {
 				colorType:0,
-				lockClick:false,
+				currentClickAble:"able",
+			}
+		},
+		watch:{
+			lockClick(){
+				if(this.lockClick){
+					this.currentClickAble="unable";
+				}else{
+					this.currentClickAble="able";
+				}
 			}
 		},
 		methods:{
 			onmousedown(e){
+				if(this.lockClick){
+					return;
+				}
+				
 				let x=e.offsetX;
 				let y=e.offsetY;
 				let ripples=document.createElement("span");
@@ -45,6 +64,12 @@
 	overflow: hidden;
 	vertical-align: middle;
 	border-radius: 10%;
+}
+.sbutton[clickable="able"]{
+	background-color: #008D57;
+}
+.sbutton[clickable="unable"]{
+	background-color: grey;
 }
 .ripples{
 	display: inline-block;

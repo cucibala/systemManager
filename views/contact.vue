@@ -1,16 +1,17 @@
 <template>
 	<div class="pageContainer">
 		<div id="fileUpLoad" class="inline-block">
-			<p class="promtTitle">文件放到这里上传</p>
+			<p class="promtTitle" v-show="isShowFileUpLoadTitle">文件放到这里上传</p>
 			<div class="backgroundPanel" :state="fileUpLoadBgState">
 				<span>释放上传</span>
 			</div>
+			<div id="fileContainer"></div>
 		</div>
 		<br>
 		<div id="toolbar-container" class="toolbar"></div>
 		<div id="text-container" class="text"></div>
 		<br>
-		<sbutton @mdEvent="test">上传到服务器</sbutton>
+		<sbutton @mdEvent="upLoadFile">上传到服务器</sbutton>
 		<!-- 这个是文件上传的模版html -->
 		<div id="preview-template" style="display: none;">
 			<div class="dz-preview">
@@ -23,7 +24,9 @@
 					<img data-dz-thumbnail/>
 				</div>
 				<div dz-max-files-reached></div>
-				<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+				<div class="dz-progress">
+					<span class="dz-upload" data-dz-uploadprogress="" isShowProgress="hide"></span>
+				</div>
 				<!--
 				 <div class="dz-success-mark"><span>✔</span></div>
 				 
@@ -36,10 +39,12 @@
 <script>
 	var myDropzone;
 	var editor;
+	var _this;
 	import dropzone from "dropzone";
 	import $ from "jquery";
 	import wangeditor from "wangeditor";
 	import sbutton from "../vue-component/sbutton.vue";
+	import webconfig from "../web.config.js";
 	export default{
 		components:{
 			sbutton,
@@ -47,61 +52,102 @@
 		data(){
 			return {
 				fileUpLoadBgState:false,
+				isShowProgress:"hide",
+				currentFileCount:0,
+			}
+		},
+		computed:{
+			isShowFileUpLoadTitle(){
+				if(this.currentFileCount>0){
+					return false;
+				}
+				return true;
 			}
 		},
 		methods:{
-			test(){
-				console.log("|asd");
-				console.log(myDropzone.getQueuedFiles());
+			upLoadFile(){
+				myDropzone.processQueue();
 			}
 		},
 		mounted(){
-			let _this=this;
-			var token="asdasd";
+			_this=this;
+			//TODO:每一次生成一个唯一的id 代表当前的操作，因为上传只能一个一个上传
+			const allowFileTypeRegex=/(jpeg)|(x-msdownload)|(zip)/ig;
 			var privewTemplateEle=document.getElementById("preview-template");
-			console.log(privewTemplateEle);
 			editor = new wangeditor("#toolbar-container", "#text-container");
 			editor.create();
-
-			myDropzone= new dropzone("#fileUpLoad", {
-				url: "/file/upload",
-				// addRemoveLinks: true,
-				maxFiles:1,
+			myDropzone= new dropzone("#fileContainer", {
+				url: webconfig.address()+"api/Contact",
+				paramName: "file",
+				acceptedFiles: ".jpg,.jpeg,.doc,.docx,.ppt,.pptx,.txt,.avi,.pdf,.mp3,.zip,.exe",
 				method: 'post',
-				filesizeBase: 1024,
-				maxFilesize:1,
-				addRemoveLinks:"dictCancelUpload",
-				headers:token,
+				//最大的上传文件大小
+				maxFilesize:1000,
 				dictDefaultMessage:"asdasd",
 				previewTemplate:privewTemplateEle.innerHTML,
 				// dictRemoveFile:document.querySelector("button"),
 				dictCancelUpload:"上传中...",
 				dictRemoveFileConfirmation:"是否删除这个文件",
+				dictDefaultMessage:"拖拽上传",
+				//是否自动上传的开关
 				autoProcessQueue:false,
-				renameFile:e=>{
-					console.log(e);
+				accept: function(file, done) {
+				    if (file.name == "justinbieber.jpg") {
+				      done("Naha, you don't.");
+				    }
+				    else { 
+						done();
+					    _this.currentFileCount++; 
+					}
 				},
 				error:e=>{
+					_this.$store.commit('addPromtMessage',"添加发生错误");
 					console.log(e);
 				},
-				sending: function(file, xhr, formData) {
-					formData.append("filesize", file.size);
+				maxfilesreached:e=>{
+					_this.$store.commit('addPromtMessage',"超过最大长传文件数量，当前文件不会被上传");
 				},
+				totaluploadprogress:e=>{
+					$(".dz-upload").attr("isShowProgress","show");
+					if(e==100){
+						setTimeout(()=>{
+							$(".dz-upload").attr("isShowProgress","hide");
+						},5000);
+					}else{
+						$(".dz-upload").attr("isShowProgress","show");
+					}
+				},
+				//发送前的钩子函数
+				sending: function(file, xhr, formData) {
+					//上传时绑定唯一id 新建一张表用来管理留言 唯一id也用  这次的id
+					console.log(file);
+					const contactMsg=document.getElementById("text-container").innerHTML;
+					formData.append("contactMsg",contactMsg);
+				},
+				//当拖拽经过框框时
 				dragover:e=>{
+					//显示上面的提示
 					_this.fileUpLoadBgState=true;
 				},
+				//拖拽离开框框时
 				dragleave:e=>{
+					//隐藏放下的提示
 					_this.fileUpLoadBgState=false;
 				},
+				//当文件被放下时
 				drop:e=>{
+					//隐藏放下的提示
 					_this.fileUpLoadBgState=false;
+					
 				},
 				success: function (file, response, e) {
 					var res = JSON.parse(response);
+					console.log(response);
 					if (res.error) {
 						$(file.previewTemplate).children('.dz-error-mark').css('opacity', '1')
 					}
-				}
+				},
+				
 			});
 		}
 	}
@@ -111,6 +157,18 @@
 @phoneSize:~"(max-width: 624px)";
 .pageContainer{
 	overflow: auto;
+}
+#fileContainer{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	flex-flow: wrap;
 }
 #fileUpLoad{
 	width: 80%;
@@ -154,14 +212,18 @@
 		resize: none;
 	}
 }
-
+#preview-template{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+}
 .dz-preview{
 	width: 120px;
 	height: 120px;
 	margin: 10px;
 	padding: 10px;
 	position: relative;
-	display: inline-block;
 	.dz-img{
 		position: absolute;
 		left:0;
@@ -173,7 +235,33 @@
 		>img{
 			border-radius: 15px;
 		}
-		
+	}
+	.dz-progress{
+		position: absolute;
+		width: 80%;
+		height: 30px;
+		top:45px;
+		left: 10%;
+		z-index: 1;
+		border-radius: 10px;
+		display: block;
+		overflow: hidden;
+		.dz-upload{
+			height: 100%;
+			width: 0%;
+			background-color: #FF5500;
+			display: block;
+			opacity: 0;
+			
+		}
+		.dz-upload[isShowProgress="show"]{
+			transition: width 2s;
+			opacity: 0.9;
+		}
+		.dz-upload[isShowProgress="hide"]{
+			transition: all 2s;
+			opacity: 0;
+		}
 	}
 }
 .dz-preview:hover{
@@ -194,6 +282,7 @@
 	z-index: 2;
 	transition: all 0.5s;
 	top: 0px;
+	background-color: antiquewhite;
 	.dz-size{
 		width: 90px;
 		height: 20px;

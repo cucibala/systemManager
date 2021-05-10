@@ -58,7 +58,8 @@
 								<span>{{data.state.StartTime.substr(11,5)}}-{{data.state.EndTime.substr(11,5)}}</span>
 								<span>{{data.state.CreateTime.substr(0,10)}}</span>
 								<span v-if="data.state.ApplyState ==='APPL'">等待审核</span>
-								<span v-else="data.state.ApplyState ==='AGRE'">审核通过</span>
+								<span v-if="data.state.ApplyState ==='PASS'">审核通过</span>
+								<span v-if="data.state.ApplyState ==='NOPASS'">审核不通过</span>
 							</div>
 						</template>
 					</template>

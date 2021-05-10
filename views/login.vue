@@ -15,6 +15,7 @@
 	import webconfig from "../web.config.js";
 	import myTools from '../link/myTools.js';
 	import md5 from "md5";
+	var returnCitySN;
 	export default{
 		components:{
 			vLoginBox,
@@ -31,9 +32,20 @@
 				formData.append("account",info.account);
 				formData.append("rgtoken",info.rgToken);
 				formData.append("password",passwordMD5);
-				formData.append("ip",returnCitySN['cip']);
-				formData.append("cip",returnCitySN['cid']);
-				formData.append("cname",returnCitySN['cname']);
+				if(returnCitySN!=undefined){
+					formData.append("ip",returnCitySN['cip']);
+					formData.append("cip",returnCitySN['cid']);
+					formData.append("cname",returnCitySN['cname']);
+				}else{
+					formData.append("ip","0.0.0.0");
+					formData.append("cip",'ea');
+					formData.append("cname",'cucibala');
+				}
+				
+				
+				
+				
+				
 				this.axios({
 					method: 'post',
 					url: webconfig.address()+"api/login",

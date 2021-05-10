@@ -1,15 +1,24 @@
 <template>
 	<div id="promtMessageBox" :state="state">
-		<p v-for="value in currentPromtMessage">{{value}}</p>
+		<p v-for="value in currentPromtMessageSplit">{{value}}</p>
 	</div>
 </template>
 <script>
+	//休眠指定的毫秒数然后返回
+	const sleepTime=time=>{
+		return new Promise(resolve=>{
+			setTimeout(()=>{
+				resolve();
+			},time);
+		});
+	}
 	export default{
 		data(){
 			return {
 				state:"hide",
 				promtList:[],
-				currentPromtMessage:"",
+				currentPromtMessageSplit:[],
+				lastPromtMessage:"",
 				promtBoxActive:false,
 			}
 		},
@@ -28,37 +37,35 @@
 			}
 		},
 		methods:{
-			reActive(){
+			async reActive(){
 				let _this=this;
-				if(!_this.promtBoxActive){
-					_this.promtBoxActive=true;
-					if(_this.promtList.length>0){
-						_this.currentPromtMessage=_this.promtList.shift().split("\n");
-						_this.state="show";
-						setTimeout(()=>{
-							_this.state="hide";
-							if(_this.promtList.length>0){
-								setTimeout(()=>{
-									_this.promtBoxActive=false;
-									_this.reActive();
-								},200);
-							}else{
-								_this.promtBoxActive=false;
-							}
-							/*setTimeout(()=>{
-								_this.state="sleep";
-								if(_this.promtList.length>0){
-									setTimeout(()=>{
-										_this.promtBoxActive=false;
-										_this.reActive();
-									},200);
-								}else{
-									_this.promtBoxActive=false;
-								}
-							},500);*/
-						},1500);
-					}
+				//如果当前正在执行动画就返回
+				if(this.promtBoxActive){
+					return;
 				}
+				
+				const asyncPromtAnimation=msg=>{
+					_this.currentPromtMessageSplit=msg.split("\n");
+					return new Promise(resolve=>{
+						setTimeout(()=>{
+							resolve();
+						},1500);
+					});
+				}
+				this.promtBoxActive=true;
+				while(this.promtList.length>0){
+					const promtMsg=this.promtList.shift();
+					//如果当前信息和上一条信息不一致则更新信息
+					if(this.lastPromtMessage!=promtMsg){
+						await sleepTime(200);
+						_this.state="show";
+						await asyncPromtAnimation(promtMsg);
+					}
+					_this.state="hide";
+					this.lastPromtMessage=promtMsg;
+				}
+				this.lastPromtMessage="";
+				this.promtBoxActive=false;
 			}
 		}
 	}
