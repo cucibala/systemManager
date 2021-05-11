@@ -118,8 +118,6 @@
 									<option value="2">管理员</option>
 								</select>
 							</div>
-							
-							
 							<sbutton @mdEvent="userManager.modify(data,0)">修改</sbutton>
 							<sbutton @mdEvent="userManager.modify(data,2)">删除</sbutton>
 						</div>
@@ -127,7 +125,42 @@
 				</div>
 			</div>
 			<div class="subViewContainer" :choice="indexPath[2].index==currentActiveIndex">
-				3
+				<div class="topBar">
+					<div>
+						<!-- 上方的toolbar -->
+						<sbutton @mdEvent="contactManager.refresh()" :lockClick="contactManager.refreshBtnLock">刷新</sbutton>
+					</div>
+					<div>
+						<!-- 中间的toolbar -->
+					</div>
+					<div>
+						<!-- TODO:完成新增的逻辑 -->
+						<!-- <sbutton @mdEvent="userManager.refresh()">新增</sbutton> -->
+					</div>
+				</div>
+				<div class="bottomContainer">
+					<template v-for="cmDataItem in contactManager.data">
+						<div class="contactItem">
+							<div class="contacTopBox">
+								<div class="detailMsg">
+									<div>留言人:{{cmDataItem.Name}}</div>
+									<div>上传时间:{{cmDataItem.UploadTime.substr(0,10)}}</div>
+								</div>
+								<div class="fileMsg">
+									<template v-for="file in cmDataItem.files">
+										<a class="filelink" @click="contactManager.downloadFile(file.FileUUID)">
+											{{file.FileName}}
+										</a>
+									</template>
+								</div>
+							</div>
+							<div class="contactBottomBox" v-html="cmDataItem.ContactMsg">
+
+							</div>
+						</div>
+					</template>
+					
+				</div>
 			</div>
 		</div>
 	</div>
@@ -145,7 +178,7 @@
 		},
 		data(){
 			return {
-				currentActiveIndex:1,
+				currentActiveIndex:2,
 				indexPath:[
 					{index:0,title:"申请审核"},
 					{index:1,title:"用户管理"},
@@ -429,6 +462,62 @@
 						
 						
 					}
+				},
+				contactManager:{
+					refreshBtnLock:false,
+					data:[],
+					refresh(){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						const action="contact";
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							this.refreshBtnLock=false;
+							return;
+						}
+						
+						const that=this;
+						const md5Value=md5(`${account}${action}${skeys}`);
+						_this.axios({
+							methods:"get",
+							url: webconfig.address()+"api/Manager",
+							headers:{
+								"Content-Type":"application/x-www-form-urlencoded"
+							},
+							params:{
+								account,
+								md5Value,
+								action,
+							}
+						}).then(res=>{
+							const resData=res.data;
+							console.log(resData);
+							if(resData.code=="200"){
+								that.data.splice(0);
+								that.data=JSON.parse(resData.data);
+								console.log(that.data);
+							}else{
+								_this.$store.commit('addPromtMessage',resData.msg);
+							}
+							
+							this.refreshBtnLock=false;
+						}).catch(ex=>{
+							_this.$store.commit('addPromtMessage',ex.message);
+							this.refreshBtnLock=false;
+						});
+					},
+					downloadFile(fileUUID){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							this.refreshBtnLock=false;
+							return;
+						}
+						
+						const fileHref=`fileUUID=${fileUUID}&account=${account}&md5Value=${md5(fileUUID+account+skeys)}`;
+						window.open(`${webconfig.address()}api/Manager/downLoadFile?${fileHref}`);
+					}
 				}
 			}
 		},
@@ -443,11 +532,10 @@
 				
 				if(this.currentActiveIndex==1){
 					this.userManager.refresh();
-					
 				}
 				
 				if(this.currentActiveIndex==2){
-					
+					this.contactManager.refresh();
 				}
 			},
 			/**
@@ -641,7 +729,43 @@
 					width: 5em;
 				}
 			}
-		
+			.contactItem{
+				width: 100%;
+				height: 300px;
+				margin: 10px 0px;
+				border: 1px solid black;
+				.contacTopBox{
+					width: 100%;
+					height: 20%;
+					display: flex;
+					flex-direction: column;
+					font-size: 20px;
+					.detailMsg{
+						height: 50%;
+						text-align: left;
+						display: flex;
+						flex-direction: row;
+						justify-content:space-around;
+						background-color:#008D57 ;
+						color: white;
+					}
+					.fileMsg{
+						height: 50%;
+						display: flex;
+						justify-content:left;
+						.filelink{
+							text-decoration: underline;
+							cursor: pointer;
+						}
+					}
+				}
+				.contactBottomBox{
+					width: 100%;
+					height: 80%;
+					overflow: auto;
+					border-top: black 1px solid;
+				}
+			}
 		}
 	}
 	.subViewContainer[choice]{

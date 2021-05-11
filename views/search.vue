@@ -1235,7 +1235,7 @@ export default{
     }
     @media @min624{
         width:440px;
-        top:200px;
+        top:70px;
         left: calc(50% - 220px);
     }
     .bg{
@@ -1288,7 +1288,7 @@ export default{
     }
     @media @pcSize{
         opacity: 0.2;
-        transform: translateY(-130%);
+        transform: translateY(-105%);
     }
 }
 .flowSearchBox[state="show"]{

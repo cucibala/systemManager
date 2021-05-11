@@ -29,11 +29,6 @@
 				<div class="dz-progress">
 					<span class="dz-upload" data-dz-uploadprogress="" isShowProgress="hide"></span>
 				</div>
-				<!--
-				<div class="dz-success-mark"><span>✔</span></div>
-				 
-				<div class="dz-error-message"><span data-dz-errormessage></span></div> 
-				-->
 			</div>
 		</div>
 	</div>
@@ -72,7 +67,7 @@
 		},
 		methods:{
 			upLoadFile(){
-				if(myDropzone.files.count>0){
+				if(myDropzone.files.length>0){
 					myDropzone.processQueue();
 				}else{
 					const fileUUID="NoFile";
@@ -162,7 +157,7 @@
 				sending: function(file, xhr, formData) {
 					const skeys=$.cookie('skeys');
 					const account=$.cookie('account');
-					const contactMsg=document.getElementById("text-container").innerHTML;
+					const contactMsg=document.querySelector("#text-container .w-e-text").innerHTML;
 					if(!account||!skeys){
 						return;
 					}
@@ -211,8 +206,7 @@
 		}
 	}
 </script>
-<style type="text/css" scoped lang="Less">
-
+<style type="text/css" scoped lang="less">
 @phoneSize:~"(max-width: 624px)";
 .pageContainer{
 	overflow: auto;
