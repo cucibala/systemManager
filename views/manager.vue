@@ -258,11 +258,12 @@
 						this.noPassApplyBtnLock=true;
 						const md5Value=md5(`${account}${action}${opreate}${JSON.stringify(applyList)}${skeys}`);
 						var that=this;
+						//POST:
 						_this.axios({
 							method:"post",
 							url: webconfig.address()+"api/Manager",
 							headers:{
-								"Content-Type":"Content-type: application/json"
+								"Content-Type":"application/json"
 							},
 							data:{
 								account,

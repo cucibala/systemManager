@@ -8,13 +8,15 @@
 			<div id="fileContainer"></div>
 		</div>
 		<br>
+		
 		<div id="toolbar-container" class="toolbar"></div>
 		<div id="text-container" class="text"></div>
 		<br>
-		<sbutton @mdEvent="upLoadFile">上传到服务器</sbutton>
+		<sbutton @mdEvent="upLoadFile" :lockClick="upLoadBtnLock">上传到服务器</sbutton>
 		<!-- 这个是文件上传的模版html -->
 		<div id="preview-template" style="display: none;">
 			<div class="dz-preview">
+				<div class="iconbg"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-tubiao-wenjian"></use></svg></div>
 				<div class="dz-details">
 					<div class="dz-size" data-dz-size></div> 
 					<div class="dz-filename"><span data-dz-name></span></div>
@@ -28,9 +30,9 @@
 					<span class="dz-upload" data-dz-uploadprogress="" isShowProgress="hide"></span>
 				</div>
 				<!--
-				 <div class="dz-success-mark"><span>✔</span></div>
+				<div class="dz-success-mark"><span>✔</span></div>
 				 
-					<div class="dz-error-message"><span data-dz-errormessage></span></div> 
+				<div class="dz-error-message"><span data-dz-errormessage></span></div> 
 				-->
 			</div>
 		</div>
@@ -45,6 +47,7 @@
 	import wangeditor from "wangeditor";
 	import sbutton from "../vue-component/sbutton.vue";
 	import webconfig from "../web.config.js";
+	import md5 from "md5";
 	export default{
 		components:{
 			sbutton,
@@ -54,6 +57,9 @@
 				fileUpLoadBgState:false,
 				isShowProgress:"hide",
 				currentFileCount:0,
+				//当前事务的uuid
+				uuid:"0000",
+				upLoadBtnLock:false,
 			}
 		},
 		computed:{
@@ -66,12 +72,47 @@
 		},
 		methods:{
 			upLoadFile(){
-				myDropzone.processQueue();
+				if(myDropzone.files.count>0){
+					myDropzone.processQueue();
+				}else{
+					const fileUUID="NoFile";
+					const uploadUUID=_this.uuid;
+					const skeys=$.cookie('skeys');
+					const account=$.cookie('account');
+					const contactMsg=document.querySelector("#text-container .w-e-text").innerHTML;
+					if(!account||!skeys){
+						return;
+					}
+					
+					const md5Value=md5(account+fileUUID+uploadUUID+contactMsg+skeys);
+					var formData=new FormData();
+					formData.append("account",account);
+					formData.append("fileUUID",fileUUID);
+					formData.append("uploadUUID",uploadUUID);
+					formData.append("contactMsg",contactMsg);
+					formData.append("md5Value",md5Value);
+					_this.axios({
+						method:"post",
+						url: webconfig.address()+"api/Contact",
+						headers: {"Content-Type": "multipart/form-data"},
+						data:formData
+					}).then(res=>{
+						const resData=res.data;
+						if(resData.code=="200"){
+							_this.$store.commit('addPromtMessage',"上传成功");
+						}else{
+							_this.$store.commit('addPromtMessage',"上传发生异常"+resData.msg);
+						}
+						
+					}).catch(ex=>{
+						_this.$store.commit('addPromtMessage',"发生异常"+ex.message);
+					});
+				}
 			}
 		},
 		mounted(){
 			_this=this;
-			//TODO:每一次生成一个唯一的id 代表当前的操作，因为上传只能一个一个上传
+			this.uuid=_this.myTools.uuid();
 			const allowFileTypeRegex=/(jpeg)|(x-msdownload)|(zip)/ig;
 			var privewTemplateEle=document.getElementById("preview-template");
 			editor = new wangeditor("#toolbar-container", "#text-container");
@@ -119,10 +160,27 @@
 				},
 				//发送前的钩子函数
 				sending: function(file, xhr, formData) {
-					//上传时绑定唯一id 新建一张表用来管理留言 唯一id也用  这次的id
-					console.log(file);
+					const skeys=$.cookie('skeys');
+					const account=$.cookie('account');
 					const contactMsg=document.getElementById("text-container").innerHTML;
+					if(!account||!skeys){
+						return;
+					}
+					
+					const fileUUID=file.upload.uuid;
+					const uploadUUID=_this.uuid;
+					const md5Value=md5(account+fileUUID+uploadUUID+contactMsg+skeys);
+					//账号
+					formData.append("account",account);
+					//md5的值
+					formData.append("md5Value",md5Value);
+					//留言信息
 					formData.append("contactMsg",contactMsg);
+					//代表当前事务的uuid 多个文件上传时会共用这一个
+					formData.append("uploadUUID",uploadUUID);
+					//文件当前文件的uuid，后面用来提取文件时使用这个,保存也使用这个
+					formData.append("fileUUID",fileUUID);
+					_this.upLoadBtnLock=true;
 				},
 				//当拖拽经过框框时
 				dragover:e=>{
@@ -142,12 +200,13 @@
 				},
 				success: function (file, response, e) {
 					var res = JSON.parse(response);
-					console.log(response);
-					if (res.error) {
-						$(file.previewTemplate).children('.dz-error-mark').css('opacity', '1')
+					if(res.code=="200"){
+						_this.$store.commit('addPromtMessage',"上传成功");
+					}else{
+						_this.$store.commit('addPromtMessage',"上传失败"+res.msg);
 					}
+					_this.upLoadBtnLock=false;
 				},
-				
 			});
 		}
 	}
@@ -224,6 +283,15 @@
 	margin: 10px;
 	padding: 10px;
 	position: relative;
+	.iconbg{
+		width: 100px;
+		height: 100px;
+		z-index: 1;
+		.icon{
+			width: 100px;
+			height: 100px;
+		}
+	}
 	.dz-img{
 		position: absolute;
 		left:0;
@@ -282,7 +350,6 @@
 	z-index: 2;
 	transition: all 0.5s;
 	top: 0px;
-	background-color: antiquewhite;
 	.dz-size{
 		width: 90px;
 		height: 20px;
