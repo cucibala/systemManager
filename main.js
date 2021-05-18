@@ -151,17 +151,10 @@ const store=new Vuex.Store({
 		},
 		//初始化房间信息
 		initRoomData(state,value){
-			/*let patternSoftware = /{(.*?)}/g;
-			let patternName = /'name':'(.*?)'/g;//匹配名字
-            let patternSystem = /'system':'(.*?)'/g;//匹配系统
-            let patternID = /'id':'(.*?)'/g;//匹配结果中的id
-            let softwaresArray=value.softwareMsgListStr.match(patternSoftware);
-            console.log(softwaresArray);
-			//JSON.parse(result);
-			softwaresArray.forEach(item=>{
-				console.log(item);
-			});
-			state.searchPageDatas.version=value.version;*/
+			if(value.newCount==0){
+				return;
+			}
+
 			state.searchPageDatas.version=value.version;
 			state.searchPageDatas.maxTotal=value.maxTotal;
 			state.searchPageDatas.currentTotal=Number(state.searchPageDatas.currentTotal)+Number(value.newCount);

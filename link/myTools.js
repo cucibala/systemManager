@@ -41,6 +41,7 @@ export default {
 			return -1;
 		}
 
+		//TODO: 比较时间算法有问题。记得修改
 		var time1Splite = time1.split(":");
 		var time2Splite = time2.split(":");
 		var result = 0;

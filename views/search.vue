@@ -39,6 +39,7 @@
                         <!-- 存在于房间信息底部的区域 -->
                         <div>
                             <sbutton @mdEvent="applyManager.initData(data.build,data.room)">申请</sbutton>
+                            <!-- 权限等于2的用户拥有的界面 -->
                             <template v-if="userLevel==2">
                                 <sbutton @mdEvent="modifyRoom(data)" class="vertical-center">
                                     修改
@@ -567,13 +568,7 @@ export default{
 							return;
 						}
 					}
-					
-					
-					
-					
-					
-					
-					
+                    
 					_this.$store.commit("getData",{opreate:"search",ts:JSON.stringify(this.data)});
 				},
 				/**
@@ -708,41 +703,47 @@ export default{
             //modifyData
             let _this=this;
             let data;
-            switch(target){
-                case "newSoftware":
-                data=this.tData;
-                break;
-                case "modifySoftware":
-                data=this.modifyData;
-                break;
-            }
-            ///-----------------判断能否添加
-            if(data.tname.length===0||data.tsystem.length==0){
-                this.$store.commit('addPromtMessage',"软件名称或系统输入不能为空");
-                return;
-            }
-            try{//判断是否存在相同的软件名称
-                data.softwares.forEach(item=>{
+            do{
+                switch(target){
+                    case "newSoftware":
+                    data=this.tData;
+                     break;
+                    case "modifySoftware":
+                    data=this.modifyData;
+                    break;
+                }
+                //判断名字是否合法
+                if(data.tname.length===0||data.tsystem.length==0){
+                    this.$store.commit('addPromtMessage',"软件名称或系统输入不能为空");
+                    break;
+                }
+                //判断是否存在相同项
+                let findResult=data.softwares.find(item=>{
                     if(data.tname==item.name&&data.tsystem==item.system){
-                        throw new Error("无法添加相同项");
+                        return true;
                     }
+                    return false;
                 });
-            }catch(e){
-                this.$store.commit('addPromtMessage',e.message);
-                return;
-            }
-            ///---------------结束验证-----------------------
-            ///---------------进行插入操作
-            data.softwares.push({
-                name:data.tname,
-                system:data.tsystem,
-                id:data.softwares.length+1,
-                state:"nromal",
-            });
-            if(!data.savename)
-            data.tname="";
-            if(!data.savesystem)
-            data.tsystem="";
+                if(findResult){
+                    this.$store.commit('addPromtMessage',"无法添加相同项");
+                    break;
+                }
+                //插入一个新的软件
+                data.softwares.push({
+                    name:data.tname,
+                    system:data.tsystem,
+                    id:0,
+                    state:"nromal",
+                });
+                //是否把名字清除掉
+                if(!data.savename){
+                    data.tname="";
+                }
+                //是否把系统清除掉
+                if(!data.savesystem){
+                    data.tsystem="";
+                }
+            }while(false);
         },
         computedSwicth(index){
             if(index==this.target){
@@ -1002,13 +1003,13 @@ export default{
 			
         },
         toggleRoomTitle(data){
-            if(data.title==data.build)
-            data.title=data.room;
-            else
-            data.title=data.build;
+            if(data.title==data.build){
+                data.title=data.room;
+            }
+            else{ 
+               data.title=data.build;
+            }
         },
-		
-		
     },
     mounted(){
         _this=this;

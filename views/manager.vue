@@ -65,11 +65,8 @@
 						<sbutton @mdEvent="userManager.refresh()" :lockClick="userManager.refreshBtnLock">刷新</sbutton>
 					</div>
 					<div>
-						<!-- 中间的toolbar -->
 					</div>
 					<div>
-						<!-- TODO:完成新增的逻辑 -->
-						<!-- <sbutton @mdEvent="userManager.refresh()">新增</sbutton> -->
 					</div>
 				</div>
 				<div class="bottomContainer">
@@ -131,11 +128,8 @@
 						<sbutton @mdEvent="contactManager.refresh()" :lockClick="contactManager.refreshBtnLock">刷新</sbutton>
 					</div>
 					<div>
-						<!-- 中间的toolbar -->
 					</div>
 					<div>
-						<!-- TODO:完成新增的逻辑 -->
-						<!-- <sbutton @mdEvent="userManager.refresh()">新增</sbutton> -->
 					</div>
 				</div>
 				<div class="bottomContainer">
@@ -516,7 +510,7 @@
 						}
 						
 						const fileHref=`fileUUID=${fileUUID}&account=${account}&md5Value=${md5(fileUUID+account+skeys)}`;
-						window.open(`${webconfig.address()}api/Manager/downLoadFile?${fileHref}`);
+						window.open(`${webconfig.address()}api/contact/downLoadFile?${fileHref}`);
 					}
 				}
 			}
@@ -764,6 +758,7 @@
 					height: 80%;
 					overflow: auto;
 					border-top: black 1px solid;
+					text-align: left;
 				}
 			}
 		}

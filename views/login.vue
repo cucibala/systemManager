@@ -41,11 +41,6 @@
 					formData.append("cip",'ea');
 					formData.append("cname",'cucibala');
 				}
-				
-				
-				
-				
-				
 				this.axios({
 					method: 'post',
 					url: webconfig.address()+"api/login",
@@ -64,13 +59,10 @@
 						_this.$store.commit('addPromtMessage',"Hello     "+result.data.user.name);
 						_this.$store.commit('initUser',result.data.user);
 						_this.$store.commit('initIndexMessage',result.data.indexMessge);
-						//_this.$store.commit('initUser',result.data);
 					}else{
 						$.removeCookie("account");
 						$.removeCookie("skeys");
 						_this.$store.commit('addPromtMessage',result.msg);
-						//_this.$router.push('/login');
-						//_this.$store.commit('addPromtMessage',result.error);
 					}
 				}).catch(error=>{
 					_this.$store.commit('addPromtMessage',"网络错误无法与服务器通讯");
@@ -111,7 +103,6 @@
 			}).catch(ex=>{
 				console.log("加载失败");
 			});
-			/*************************/
 		}
 	}
 </script>
