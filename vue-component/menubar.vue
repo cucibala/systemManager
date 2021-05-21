@@ -15,7 +15,7 @@
 					<li @click="menuClick" v-if="userMsg.level==2">
 						<router-link  to="/manager" >审核</router-link>
 					</li>
-					<li @click="menuClick">
+					<li @click="menuClick" v-if="userMsg.level>=1" >
 						<router-link  to="/contact" >留言</router-link>
 					</li>
 					<!-- <li @click="menuClick">

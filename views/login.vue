@@ -5,7 +5,7 @@
 				实验室管理系统
 			</span>
 		</div>
-		<v-login-box @login="handleLogin($event)"></v-login-box>
+		<v-login-box @login="handleLogin($event)" :reSet="reSetLogin"></v-login-box>
 	</div>
 </template>
 <script type="text/javascript">
@@ -16,6 +16,9 @@
 	import myTools from '../link/myTools.js';
 	import md5 from "md5";
 	export default{
+		data(){
+			return {reSetLogin:false}
+		},
 		components:{
 			vLoginBox,
 		},
@@ -67,6 +70,7 @@
 						$.removeCookie("skeys");
 						_this.$store.commit('addPromtMessage',result.msg);
 					}
+					_this.reSetLogin=!_this.reSetLogin;
 				}).catch(error=>{
 					_this.$store.commit('addPromtMessage',"网络错误无法与服务器通讯");
 					console.log(error);

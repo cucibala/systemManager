@@ -16,7 +16,7 @@
 					<div class="vaptcha-init-main">
 						<div class="vaptcha-init-loading">
 							<a href="/" target="_blank">
-								<img src="https://r.vaptcha.net/public/img/vaptcha-loading.gif" />
+								<img src="https://r.vaptcha.net/public/img/vaptcha-loading.gif"/>
 							</a>
 							<span class="vaptcha-text">Vaptcha启动中...</span>
 						</div>
@@ -38,6 +38,9 @@
 	import $ from "jquery";
 	require('../link/vaptcha.js');
 	export default{
+		props:{
+			reSet:{type:Boolean,default:false},
+		},
 		methods:{
 			buttonClick(){
 				if(this.rgToken=="unset"){
@@ -85,6 +88,12 @@
 					this.changeFontSize2=true;
 					this.passwordState="bigfont";
 					$(".smallWidth:nth-child(3)>input").css("font-size","40px");
+				}
+			},
+			reSet(){
+				this.rgToken="";
+				if(this.vaptcha){
+					this.vaptcha.reset();
 				}
 			}
 		},

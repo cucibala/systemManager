@@ -100,7 +100,7 @@
 #introduce-window{
 	position: relative;
 	width: 100%;
-	height: 821px;
+	height: 100%;
 	@media @min624{
 		position: fixed;
 	}
@@ -111,7 +111,7 @@
 		top:0px;
 		right: 0px;
 		@media @min624{
-			height: 821px;
+			height: 100%;
 		}
 		.img-area{
 			overflow: hidden;
@@ -164,7 +164,7 @@
 			overflow: hidden;
 			@media @pcSize{
 				left: 0px;
-				bottom: 0px;
+				bottom: 10px;
 				width: 46%;
 				height: 400px;
 			}

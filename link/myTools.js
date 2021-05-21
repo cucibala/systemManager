@@ -44,28 +44,16 @@ export default {
 		//TODO: 比较时间算法有问题。记得修改
 		var time1Splite = time1.split(":");
 		var time2Splite = time2.split(":");
+		console.log("输入格式不正确", time1Splite, time2Splite);
 		var result = 0;
 		if (time1Splite.length !== 2 || time2Splite.length !== 2) {
 			console.log("输入格式不正确", time1Splite, time2Splite)
 			return -1;
 		}
 
-		do {
-			if (time1Splite.length === 0) {
-				break;
-			}
-
-			var t1 = Number(time1Splite.shift());
-			var t2 = Number(time2Splite.shift());
-			if ((t1 != 0 && !t1) || (t2 != 0 && !t2)) {
-				console.log("输入格式不正确", t1, t2)
-				return -1;
-			}
-
-			result=t2-t1;
-		} while (true);
-
-		return result;
+		const hour=(time2Splite[0]-time1Splite[0])*60;
+		const minute=time2Splite[1]-time1Splite[1];
+		return hour+minute;
 	},
 	/**
 	 * 比较两个时间

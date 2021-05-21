@@ -112,6 +112,7 @@ const store=new Vuex.Store({
         //初始化用户信息 name level
 		initUser(state,obj){
 			state.user=obj;
+			console.log(obj);
 		},
 		//刷新主页面的信息
 		refreshPage(state){

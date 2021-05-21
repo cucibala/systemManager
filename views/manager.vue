@@ -139,12 +139,15 @@
 								<div class="detailMsg">
 									<div>留言人:{{cmDataItem.Name}}</div>
 									<div>上传时间:{{cmDataItem.UploadTime.substr(0,10)}}</div>
+									<div><input type="text" v-model="cmDataItem.tempReceiveMsg"><sbutton @mdEvent="contactManager.receiveContact(cmDataItem.UploadUUID,cmDataItem.tempReceiveMsg)" :lockClick="contactManager.receiveContactBtnLock">回复</sbutton></div>
+									<div><sbutton @mdEvent="contactManager.removeContact(cmDataItem.UploadUUID)" :lockClick="contactManager.removeContactBtnLock">删除</sbutton></div>
 								</div>
 								<div class="fileMsg">
 									<template v-for="file in cmDataItem.files">
 										<a class="filelink" @click="contactManager.downloadFile(file.FileUUID)">
 											{{file.FileName}}
 										</a>
+										&nbsp;&nbsp;&nbsp;
 									</template>
 								</div>
 							</div>
@@ -152,8 +155,22 @@
 
 							</div>
 						</div>
+						<div class="receiveContainer">
+							<template v-for="receiveMsg in cmDataItem.receiveMsgs">
+								<div class="contactReceive">
+									<span>
+										{{receiveMsg.name}}:
+									</span>
+									<span>
+										{{receiveMsg.receiveContent}}
+									</span>
+									<span>
+										{{receiveMsg.receiveTime.substr(0,10)}}
+									</span>
+								</div>
+							</template>
+						</div>
 					</template>
-					
 				</div>
 			</div>
 		</div>
@@ -459,11 +476,13 @@
 				},
 				contactManager:{
 					refreshBtnLock:false,
+					removeContactBtnLock:false,
+					receiveContactBtnLock:false,
 					data:[],
 					refresh(){
 						const skeys=$.cookie('skeys');
 						const account=$.cookie('account');
-						const action="contact";
+						const type="manager";
 						if(!account){
 							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
 							this.refreshBtnLock=false;
@@ -471,17 +490,17 @@
 						}
 						
 						const that=this;
-						const md5Value=md5(`${account}${action}${skeys}`);
+						const md5Value=md5(`${account}${type}${skeys}`);
 						_this.axios({
 							methods:"get",
-							url: webconfig.address()+"api/Manager",
+							url: webconfig.address()+"api/Contact",
 							headers:{
 								"Content-Type":"application/x-www-form-urlencoded"
 							},
 							params:{
 								account,
 								md5Value,
-								action,
+								type,
 							}
 						}).then(res=>{
 							const resData=res.data;
@@ -489,6 +508,9 @@
 							if(resData.code=="200"){
 								that.data.splice(0);
 								that.data=JSON.parse(resData.data);
+								that.data.forEach(item=>{
+									item.tempReceiveMsg="";
+								});
 								console.log(that.data);
 							}else{
 								_this.$store.commit('addPromtMessage',resData.msg);
@@ -511,6 +533,85 @@
 						
 						const fileHref=`fileUUID=${fileUUID}&account=${account}&md5Value=${md5(fileUUID+account+skeys)}`;
 						window.open(`${webconfig.address()}api/contact/downLoadFile?${fileHref}`);
+					},
+					/**
+					 * 删除一条留言信息
+					 */
+					removeContact(uploadUUID){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							return;
+						}
+
+						const action="contact";
+						const opreate="delete";
+						var md5Value=md5(account+uploadUUID+skeys);
+						let that=this;
+						_this.axios({
+							method:"post",
+							url: webconfig.address()+"api/contact/delete",
+							headers:{
+								"Content-Type":"application/json"
+							},
+							data:{
+								account,
+								uploadUUID,
+								md5Value,
+							}
+						}).then(res=>{
+							let resData=res.data;
+							if(resData.code=="200"){
+								_this.$store.commit('addPromtMessage',"删除成功");
+							}else{
+								_this.$store.commit('addPromtMessage',"删除失败发生异常"+resData.msg);
+							}
+							that.refresh();
+						}).catch(ex=>{
+							_this.$store.commit('addPromtMessage',ex.message);
+							this.refreshBtnLock=false;
+						});
+					},
+					receiveContact(uploadUUID,receiveMsg){
+						const skeys=$.cookie('skeys');
+						const account=$.cookie('account');
+						if(!account){
+							_this.$store.commit('addPromtMessage',"获取发生异常，当前登陆信息丢失");
+							return;
+						}
+
+						if(receiveMsg.length==0){
+							_this.$store.commit('addPromtMessage',"回复内容不能为空");
+							return;
+						}
+
+						var md5Value=md5(account+uploadUUID+receiveMsg+skeys);
+						let that=this;
+						_this.axios({
+							method:"post",
+							url: webconfig.address()+"api/contact/receive",
+							headers:{
+								"Content-Type":"application/json"
+							},
+							data:{
+								account,
+								uploadUUID,
+								receiveMsg,
+								md5Value,
+							}
+						}).then(res=>{
+							let resData=res.data;
+							if(resData.code=="200"){
+								_this.$store.commit('addPromtMessage',"回复成功");
+							}else{
+								_this.$store.commit('addPromtMessage',"回复失败发生异常"+resData.msg);
+							}
+							that.refresh();
+						}).catch(ex=>{
+							_this.$store.commit('addPromtMessage',ex.message);
+							this.refreshBtnLock=false;
+						});
 					}
 				}
 			}
@@ -730,23 +831,26 @@
 				border: 1px solid black;
 				.contacTopBox{
 					width: 100%;
-					height: 20%;
+					height: 30%;
 					display: flex;
 					flex-direction: column;
-					font-size: 20px;
+					font-size: 15px;
 					.detailMsg{
 						height: 50%;
 						text-align: left;
 						display: flex;
 						flex-direction: row;
 						justify-content:space-around;
-						background-color:#008D57 ;
-						color: white;
+						align-content: center;
+						align-items: center;
+						background-color:#dcffbfc4 ;
+						color: black;
 					}
 					.fileMsg{
 						height: 50%;
 						display: flex;
 						justify-content:left;
+						overflow: hidden;
 						.filelink{
 							text-decoration: underline;
 							cursor: pointer;
@@ -755,10 +859,39 @@
 				}
 				.contactBottomBox{
 					width: 100%;
-					height: 80%;
+					height: 70%;
 					overflow: auto;
 					border-top: black 1px solid;
 					text-align: left;
+				}
+			}
+			.receiveContainer{
+				width: 100%;
+				height: 100px;
+				overflow: auto;
+			}
+			.contactReceive{
+				margin: 1px 0px;
+				width: 100%;
+				height: 20px;
+				text-align: left;
+				background-color: #ffbc9a;
+				display: flex;
+				flex-direction: row;
+				span{
+					display: inline-block;
+					height: 100%;
+					font-size: 15px;
+					
+				}
+				span:nth-child(1){
+					width: 20%;
+				}
+				span:nth-child(2){
+					width: 60%;
+				}
+				span:nth-child(3){
+					width: 20%;
 				}
 			}
 		}

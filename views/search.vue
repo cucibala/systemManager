@@ -38,7 +38,7 @@
                         </div>
                         <!-- 存在于房间信息底部的区域 -->
                         <div>
-                            <sbutton @mdEvent="applyManager.initData(data.build,data.room)">申请</sbutton>
+                            <sbutton v-if="userLevel>=1" @mdEvent="applyManager.initData(data.build,data.room)">申请</sbutton>
                             <!-- 权限等于2的用户拥有的界面 -->
                             <template v-if="userLevel==2">
                                 <sbutton @mdEvent="modifyRoom(data)" class="vertical-center">
@@ -467,8 +467,10 @@ export default{
 						_this.$store.commit('addPromtMessage',"开始日期不能大于结束日期");
 						return;
 					}
-					
-					if(_this.myTools.compareTime(this.applyForm.startTime,this.applyForm.endTime)>0){
+
+					console.log(_this.myTools.compareTime(this.applyForm.startTime,this.applyForm.endTime));
+					if(_this.myTools.compareTime(this.applyForm.startTime,this.applyForm.endTime)<0){
+                       
 						_this.$store.commit('addPromtMessage',"开始时间不能大于结束时间");
 						return;
 					}
@@ -569,6 +571,10 @@ export default{
 						}
 					}
                     
+                    if(!this.data.peopleCpa){
+                        this.data.peopleCpa=0;
+                    }
+
 					_this.$store.commit("getData",{opreate:"search",ts:JSON.stringify(this.data)});
 				},
 				/**
@@ -778,6 +784,7 @@ export default{
 		        console.log("删除");
 		    }
 			
+            console.log(value);
 		    setTimeout(()=>{
 		        data.softwares.splice(removeItemIndex,1);
 		    },500);
@@ -960,6 +967,7 @@ export default{
             data.softwares=[];
             roomMSG.softwares.datas.forEach(item=>{
                 let temp={};
+                console.log(item);
                 temp.name=item.name;
                 temp.id=item.id;
                 temp.system=item.system;
