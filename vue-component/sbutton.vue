@@ -57,7 +57,7 @@
 	padding: 4px;
 	cursor: pointer;
 	user-select:none;
-	transition: all 2s ease 0s;
+	
 	background-color: #008D57;
 	color: white;
 	position: relative;
@@ -66,6 +66,7 @@
 	border-radius: 10%;
 }
 .sbutton[clickable="able"]{
+	transition: all 1s ease 0s;
 	background-color: #008D57;
 }
 .sbutton[clickable="unable"]{

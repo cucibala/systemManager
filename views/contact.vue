@@ -127,6 +127,8 @@
 				dictDefaultMessage:"拖拽上传",
 				//是否自动上传的开关
 				autoProcessQueue:false,
+				//设置一次上传文件的数量
+				parallelUploads:1,
 				accept: function(file, done) {
 				    if (file.name == "justinbieber.jpg") {
 				      done("Naha, you don't.");
@@ -195,12 +197,27 @@
 				},
 				success: function (file, response, e) {
 					var res = JSON.parse(response);
-					if(res.code=="200"){
-						_this.$store.commit('addPromtMessage',"上传成功");
-					}else{
-						_this.$store.commit('addPromtMessage',"上传失败"+res.msg);
-					}
-					_this.upLoadBtnLock=false;
+					do{
+						if(res.code=="200"){
+							_this.$store.commit('addPromtMessage',"上传成功");
+							let continueUpload=false;
+							console.log(this);
+							this.files.forEach(element => {
+								if(element.status=="queued"){
+									continueUpload=true;
+								}
+							});
+							if(continueUpload){
+								_this.upLoadFile();
+								break;
+							}
+							_this.upLoadBtnLock=false;
+						}else{
+							_this.$store.commit('addPromtMessage',"上传失败"+res.msg);
+							_this.upLoadBtnLock=false;
+						}
+					}while(false);
+
 				},
 			});
 		}

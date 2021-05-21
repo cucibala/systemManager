@@ -15,7 +15,6 @@
 	import webconfig from "../web.config.js";
 	import myTools from '../link/myTools.js';
 	import md5 from "md5";
-	var returnCitySN;
 	export default{
 		components:{
 			vLoginBox,
@@ -32,10 +31,14 @@
 				formData.append("account",info.account);
 				formData.append("rgtoken",info.rgToken);
 				formData.append("password",passwordMD5);
-				if(returnCitySN!=undefined){
-					formData.append("ip",returnCitySN['cip']);
-					formData.append("cip",returnCitySN['cid']);
-					formData.append("cname",returnCitySN['cname']);
+
+				const ip=$.cookie('city_ip');
+				const cip=$.cookie('city_cip');
+				const cname=$.cookie('cname');
+				if(ip&&cip&&cname){
+					formData.append("ip",ip);
+					formData.append("cip",cip);
+					formData.append("cname",cname);
 				}else{
 					formData.append("ip","0.0.0.0");
 					formData.append("cip",'ea');
@@ -48,17 +51,17 @@
 					data:formData,
 				}).then((response) => {
 					let result=response.data;
-					console.log(result);
 					if(result.code=="200"){
-						let skeys=result.data.user.skeys;
-						let account=result.data.user.account;
+						let resData=JSON.parse(result.data);
+						let skeys=resData.user.skeys;
+						let account=resData.user.account;
 						$.cookie('account', account, { expires: 1 });
 						$.cookie('skeys', skeys, { expires: 1 });
 						$.cookie('isLogin', true);
 						_this.$router.push('/index');
-						_this.$store.commit('addPromtMessage',"Hello     "+result.data.user.name);
-						_this.$store.commit('initUser',result.data.user);
-						_this.$store.commit('initIndexMessage',result.data.indexMessge);
+						_this.$store.commit('addPromtMessage',"Hello     "+resData.user.name);
+						_this.$store.commit('initUser',resData.user);
+						_this.$store.commit('initIndexMessage',resData.indexMessge);
 					}else{
 						$.removeCookie("account");
 						$.removeCookie("skeys");
@@ -66,13 +69,17 @@
 					}
 				}).catch(error=>{
 					_this.$store.commit('addPromtMessage',"网络错误无法与服务器通讯");
+					console.log(error);
 				});
 			}
 		},
 		mounted(){
 			/*添加新浪的ip地址查询  {"cip": "116.22.135.37", "cid": "440106", "cname": "广东省广州市天河区"}->>>使用方法returnCitySN[cip]*/
 			myTools.loadScript('http://pv.sohu.com/cityjson?ie=utf-8').then(result=>{
-				 /*进行登陆判断*/
+				$.cookie('city_ip', returnCitySN['cip']);
+				$.cookie('city_cip', returnCitySN['cid']);
+				$.cookie('cname', returnCitySN['cname']);
+				/*进行登陆判断*/
 			    let skeys=$.cookie('skeys');
 			    let account=$.cookie('account');
 			    let _this=this;

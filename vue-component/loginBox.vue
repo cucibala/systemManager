@@ -40,6 +40,11 @@
 	export default{
 		methods:{
 			buttonClick(){
+				if(this.rgToken=="unset"){
+					this.$store.commit('addPromtMessage',"请完成验证码操作");
+					return;
+				}
+
 				this.$emit('login',{account:this.account,password:this.password,rgToken:this.rgToken});
 			}
 		},
@@ -75,7 +80,6 @@
 						this.changeFontSize2=false;
 						this.passwordState="smallfont";
 						$(".smallWidth:nth-child(3)>input").css("font-size","20px");
-						console.log("ehcek");
 					}
 				}else{
 					this.changeFontSize2=true;
@@ -90,6 +94,7 @@
 			vaptcha({
       			vid: '5f8aafec7308a5b75b44ce01', // 验证单元id
       			type: 'click', // 展现类型 点击式
+				scene: 0,//验证场景
       			container: '#vaptchaContainer', // 按钮容器，可为Element 或者 selector
       		}).then(function (vaptchaObj) {
      			vaptchaObj.render()// 调用验证实例 vaptchaObj 的 render 方法加载验证按钮
